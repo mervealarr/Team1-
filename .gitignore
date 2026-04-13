@@ -1,0 +1,45 @@
+# ==================================
+# macOS
+# ==================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==================================
+# Visual Studio / .NET Core (API)
+# ==================================
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+# Geliştirme ortamı yapılandırmaları
+appsettings.Development.json
+appsettings.Development.*.json
+# Eğer varsa geçici log dosyaları
+server.log
+*.log
+
+# ==================================
+# Node.js / React (Web)
+# ==================================
+# Bağımlılıklar
+node_modules/
+# Derlenmiş üretim (production) dosyaları
+dist/
+dist-ssr/
+build/
+# Ortam değişkenleri (Şifreler/Anahtarlar)
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# npm logları
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
