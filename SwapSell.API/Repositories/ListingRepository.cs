@@ -42,5 +42,11 @@ namespace SwapSell.API.Repositories
             _context.Listings.Remove(listing);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> UpdateListingAsync(Listing listing)
+        {
+            _context.Listings.Update(listing);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace SwapSell.API.Services
             {
                 Title = dto.Title,
                 Description = dto.Description,
+                Category = dto.Category,
                 Price = dto.Price,
                 ImageUrl = dto.ImageUrl ?? string.Empty,
                 UserId = userId
@@ -34,6 +35,7 @@ namespace SwapSell.API.Services
                 Id = created.Id,
                 Title = created.Title,
                 Description = created.Description,
+                Category = created.Category,
                 Price = created.Price,
                 ImageUrl = created.ImageUrl,
                 CreatedAt = created.CreatedAt,
@@ -50,6 +52,7 @@ namespace SwapSell.API.Services
                 Id = l.Id,
                 Title = l.Title,
                 Description = l.Description,
+                Category = l.Category,
                 Price = l.Price,
                 ImageUrl = l.ImageUrl,
                 CreatedAt = l.CreatedAt,
@@ -68,6 +71,7 @@ namespace SwapSell.API.Services
                 Id = listing.Id,
                 Title = listing.Title,
                 Description = listing.Description,
+                Category = listing.Category,
                 Price = listing.Price,
                 ImageUrl = listing.ImageUrl,
                 CreatedAt = listing.CreatedAt,
@@ -86,6 +90,35 @@ namespace SwapSell.API.Services
             if (listing.UserId != userId) return false;
 
             return await _listingRepository.DeleteListingAsync(listing);
+        }
+
+        public async Task<ListingResponseDto?> UpdateListingAsync(int id, UpdateListingDto dto, int userId)
+        {
+            var listing = await _listingRepository.GetListingByIdAsync(id);
+            if (listing == null) return null;
+            if (listing.UserId != userId) return null;
+
+            listing.Title = dto.Title;
+            listing.Description = dto.Description;
+            listing.Category = dto.Category;
+            listing.Price = dto.Price;
+            listing.ImageUrl = dto.ImageUrl ?? string.Empty;
+
+            var success = await _listingRepository.UpdateListingAsync(listing);
+            if (!success) return null;
+
+            return new ListingResponseDto
+            {
+                Id = listing.Id,
+                Title = listing.Title,
+                Description = listing.Description,
+                Category = listing.Category,
+                Price = listing.Price,
+                ImageUrl = listing.ImageUrl,
+                CreatedAt = listing.CreatedAt,
+                SellerId = listing.UserId,
+                SellerEmail = listing.User?.Email ?? string.Empty
+            };
         }
     }
 }

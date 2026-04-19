@@ -18,6 +18,10 @@ namespace SwapSell.API.Models
         public string Description { get; set; } = string.Empty;
 
         [Required]
+        [MaxLength(50)]
+        public string Category { get; set; } = string.Empty;
+
+        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 

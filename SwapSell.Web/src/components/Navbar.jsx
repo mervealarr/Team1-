@@ -5,8 +5,15 @@ import './Navbar.css';
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('query');
+    setSearchQuery(query || '');
+  }, [location.search]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +48,20 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/listings?query=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate(`/listings`);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <nav className={`navbar ${scrolled ? 'navbar-scrolled glass' : ''}`}>
       <div className="navbar-container">
@@ -49,8 +70,14 @@ const Navbar = () => {
         </Link>
         
         <div className="navbar-search">
-          <input type="text" placeholder="Ürün, kategori veya marka ara..." />
-          <button className="search-btn">
+          <input 
+            type="text" 
+            placeholder="Ürün, kategori veya marka ara..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button className="search-btn" onClick={handleSearch}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>

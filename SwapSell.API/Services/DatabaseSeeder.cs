@@ -47,6 +47,7 @@ namespace SwapSell.API.Services
                     {
                         Title = "MacBook Pro M2 16\"",
                         Description = "Tertemiz, çiziksiz M2 işlemcili MacBook Pro. 16GB RAM, 512GB SSD.",
+                        Category = "Elektronik",
                         Price = 45000m,
                         ImageUrl = "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
                         UserId = user.Id,
@@ -56,6 +57,7 @@ namespace SwapSell.API.Services
                     {
                         Title = "Sony Alpha a7 III Kasa",
                         Description = "Profesyonel aynasız fotoğraf makinesi. Sadece kasa, lens dahil değildir. Shutter 12K.",
+                        Category = "Elektronik",
                         Price = 32500m,
                         ImageUrl = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
                         UserId = user.Id,
@@ -65,6 +67,7 @@ namespace SwapSell.API.Services
                     {
                         Title = "Herman Miller Aeron Koltuk",
                         Description = "B size, bel destekli efsane ofis koltuğu. Garantisi devam ediyor.",
+                        Category = "Mobilya",
                         Price = 18000m,
                         ImageUrl = "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&w=800&q=80",
                         UserId = user.Id,
@@ -74,6 +77,7 @@ namespace SwapSell.API.Services
                     {
                         Title = "PlayStation 5 Çift Kol",
                         Description = "Kutusunda duruyor, zamanım olmadığı için satıyorum. 2 adet dualsense dahil.",
+                        Category = "Elektronik",
                         Price = 15500m,
                         ImageUrl = "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80",
                         UserId = user.Id,

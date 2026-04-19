@@ -9,6 +9,7 @@ namespace SwapSell.API.Repositories
         Task<Listing> AddListingAsync(Listing listing);
         Task<IEnumerable<Listing>> GetAllListingsAsync();
         Task<Listing?> GetListingByIdAsync(int id);
+        Task<bool> UpdateListingAsync(Listing listing);
         Task<bool> DeleteListingAsync(Listing listing);
     }
 }

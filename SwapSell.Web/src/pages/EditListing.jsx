@@ -1,53 +1,82 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api';
-import './Auth.css'; // using same styles as auth forms
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import api, { getCurrentUserId } from '../api';
+import './Auth.css';
 
-const CreateListing = () => {
+const EditListing = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  const handleCreate = async (e) => {
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        const response = await api.get(`/listings/${id}`);
+        const data = response.data;
+        
+        // Strict ownership check locally just to be safe
+        const currentUserId = getCurrentUserId();
+        if (data.sellerId !== currentUserId) {
+          navigate('/');
+          return;
+        }
+
+        setTitle(data.title);
+        setDescription(data.description);
+        setPrice(data.price);
+        setCategory(data.category);
+        setImageUrl(data.imageUrl);
+      } catch (err) {
+        setError('İlan bilgileri alınamadı veya bu sayfaya erişim yetkiniz yok.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchListing();
+  }, [id, navigate]);
+
+  const handleUpdate = async (e) => {
     e.preventDefault();
     setError('');
     
     try {
-      const response = await api.post('/listings', { 
+      await api.put(`/listings/${id}`, { 
         title, 
         description, 
         category,
         price: parseFloat(price),
         imageUrl
       });
-      // Redirect to the newly created product details
-      if (response.data && response.data.id) {
-        navigate(`/listings/${response.data.id}`);
-      } else {
-        navigate('/');
-      }
+      // Redirect back to listings or details page
+      navigate(`/listings/${id}`);
     } catch (err) {
-      if (err.response?.status === 401) {
-        setError('Oturumunuzun süresi dolmuş. Lütfen tekrar giriş yapın.');
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setError('Yetkiniz yok veya oturumunuzun süresi dolmuş.');
       } else {
-        setError('Ürün yüklenirken bir hata oluştu.');
+        setError('İlan güncellenirken bir hata oluştu.');
       }
     }
   };
 
+  if (loading) return <div style={{ textAlign: 'center', padding: '4rem' }}>Yükleniyor...</div>;
+
   return (
     <div className="auth-container">
       <div className="auth-card glass" style={{ maxWidth: '600px' }}>
-        <h2 className="auth-title">Yeni İlan Ekle</h2>
-        <p className="auth-subtitle">Ürününüzü binlerce alıcıyla buluşturun.</p>
+        <h2 className="auth-title">İlanı Düzenle</h2>
+        <p className="auth-subtitle">Mevcut ilanınızın bilgilerini güncelleyin.</p>
         
         {error && <div className="auth-error">{error}</div>}
         
-        <form onSubmit={handleCreate} className="auth-form">
+        <form onSubmit={handleUpdate} className="auth-form">
           <div className="form-group">
             <label htmlFor="title">Ürün Başlığı</label>
             <input 
@@ -55,7 +84,6 @@ const CreateListing = () => {
               id="title" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Örn: iPhone 13 Pro Max - Kusursuz"
               required 
               maxLength="100"
             />
@@ -96,7 +124,6 @@ const CreateListing = () => {
               id="price" 
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="Örn: 35000"
               required 
               min="1"
               step="0.01"
@@ -110,7 +137,6 @@ const CreateListing = () => {
               id="imageUrl" 
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
             />
           </div>
 
@@ -120,7 +146,6 @@ const CreateListing = () => {
               id="description" 
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ürününüzün durumunu, özelliklerini ve varsa kusurlarını belirtin."
               required 
               rows="6"
               style={{
@@ -136,11 +161,11 @@ const CreateListing = () => {
             />
           </div>
           
-          <button type="submit" className="btn btn-primary btn-block">İlanı Yayınla</button>
+          <button type="submit" className="btn btn-primary btn-block">Değişiklikleri Kaydet</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default CreateListing;
+export default EditListing;

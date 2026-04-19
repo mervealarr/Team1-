@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import api, { getCurrentUserId } from '../api';
 import './FeaturedItems.css';
 
 const FeaturedItems = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const navigate = useNavigate();
+  const currentUserId = getCurrentUserId();
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -22,10 +25,52 @@ const FeaturedItems = () => {
     fetchListings();
   }, []);
 
+  const filteredItems = items.filter(item => {
+    // Keyword match
+    const query = searchQuery.toLowerCase();
+    const matchTitle = (item.title || '').toLowerCase().includes(query);
+    const matchDesc = (item.description || '').toLowerCase().includes(query);
+    const matchesKeyword = matchTitle || matchDesc;
+
+    // Category match
+    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+
+    return matchesKeyword && matchesCategory;
+  });
+
   return (
     <section className="featured-section">
       <div className="section-header">
         <h2 className="section-title">Öne Çıkan Fırsatlar</h2>
+        <div className="search-container" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <select 
+            value={selectedCategory} 
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            style={{
+              padding: '0.8rem 1.2rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-tertiary)',
+              color: 'var(--text-primary)',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="All">Tümü (Kategori)</option>
+            <option value="Elektronik">Elektronik</option>
+            <option value="Mobilya">Mobilya</option>
+            <option value="Giyim">Giyim</option>
+            <option value="Kitap">Kitap</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+          <input 
+            type="text" 
+            placeholder="Aramak için yazın..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
         <button className="btn btn-secondary">Tümünü Gör</button>
       </div>
 
@@ -35,9 +80,13 @@ const FeaturedItems = () => {
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-lg)' }}>
           Henüz hiç ilan yok. İlk ilanı sen ver!
         </div>
+      ) : filteredItems.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-lg)' }}>
+          No results found
+        </div>
       ) : (
         <div className="items-grid">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <div key={item.id} className="item-card glass" onClick={() => navigate(`/listings/${item.id}`)} style={{ cursor: 'pointer' }}>
               <div className="item-image-container">
                 {/* Fallback placeholder image initially since uploading isn't implemented */}
@@ -54,11 +103,18 @@ const FeaturedItems = () => {
                     <div className="seller-avatar"></div>
                     <span className="seller-name">{item.sellerEmail.split('@')[0]}</span>
                   </div>
-                  <button className="action-btn" onClick={(e) => { e.stopPropagation(); /* Favoriye Ekle mock */ }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {item.sellerId === currentUserId && (
+                      <button className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); navigate(`/edit-listing/${item.id}`); }}>
+                        Düzenle
+                      </button>
+                    )}
+                    <button className="action-btn" onClick={(e) => { e.stopPropagation(); /* Favoriye Ekle mock */ }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

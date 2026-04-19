@@ -74,5 +74,25 @@ namespace SwapSell.API.Controllers
 
             return NoContent();
         }
+
+        // Feature 5: Update Own Listing
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ListingResponseDto>> Update(int id, [FromBody] UpdateListingDto dto)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+            {
+                return Unauthorized(new { message = "Invalid user token." });
+            }
+
+            var result = await _listingService.UpdateListingAsync(id, dto, userId);
+            if (result == null)
+            {
+                return Forbid("You do not have permission to edit this listing or it does not exist.");
+            }
+
+            return Ok(result);
+        }
     }
 }

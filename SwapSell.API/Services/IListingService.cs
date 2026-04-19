@@ -9,6 +9,7 @@ namespace SwapSell.API.Services
         Task<ListingResponseDto> CreateListingAsync(CreateListingDto dto, int userId);
         Task<IEnumerable<ListingResponseDto>> GetAllListingsAsync();
         Task<ListingResponseDto?> GetListingByIdAsync(int id);
+        Task<ListingResponseDto?> UpdateListingAsync(int id, UpdateListingDto dto, int userId);
         Task<bool> DeleteListingAsync(int id, int userId);
     }
 }

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../api';
+import api, { getCurrentUserId } from '../api';
 import './ProductDetails.css';
-import { parseJwt } from '../utils';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -19,14 +18,9 @@ const ProductDetails = () => {
         setProduct(response.data);
         
         // Check ownership
-        const token = localStorage.getItem('token');
-        if (token) {
-            const decoded = parseJwt(token);
-            // using exact case of standard JWT claims or .NET claim mapping
-            const userEmail = decoded?.email || decoded?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
-            if (userEmail && userEmail === response.data.sellerEmail) {
-                setIsOwner(true);
-            }
+        const currentUserId = getCurrentUserId();
+        if (currentUserId && currentUserId === response.data.sellerId) {
+            setIsOwner(true);
         }
       } catch (err) {
         setError('Ürün detayları yüklenemedi veya ürün bulunamadı.');
@@ -91,9 +85,14 @@ const ProductDetails = () => {
 
           <div className="product-actions">
             {isOwner ? (
-                <button onClick={handleDelete} className="btn action-btn" style={{ background: 'var(--error)', color: 'white' }}>
-                    İlanı Sil
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button onClick={() => navigate(`/edit-listing/${product.id}`)} className="btn action-btn btn-secondary">
+                        İlanı Düzenle
+                    </button>
+                    <button onClick={handleDelete} className="btn action-btn" style={{ background: 'var(--error)', color: 'white' }}>
+                        İlanı Sil
+                    </button>
+                </div>
             ) : (
                 <>
                     <button className="btn btn-primary btn-lg action-btn">Satıcıya Mesaj Gönder</button>
