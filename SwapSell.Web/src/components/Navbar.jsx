@@ -88,6 +88,7 @@ const Navbar = () => {
         <div className="navbar-actions">
           {isAuthenticated ? (
             <>
+              <Link to="/profile" className="btn btn-secondary">Hesabım</Link>
               <button onClick={handleLogout} className="btn btn-secondary">Çıkış Yap</button>
               <Link to="/create-listing" className="btn btn-primary">İlan Ver</Link>
             </>
