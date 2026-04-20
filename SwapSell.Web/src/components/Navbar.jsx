@@ -88,6 +88,13 @@ const Navbar = () => {
         <div className="navbar-actions">
           {isAuthenticated ? (
             <>
+              <Link to="/profile" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Profilim
+              </Link>
               <button onClick={handleLogout} className="btn btn-secondary">Çıkış Yap</button>
               <Link to="/create-listing" className="btn btn-primary">İlan Ver</Link>
             </>

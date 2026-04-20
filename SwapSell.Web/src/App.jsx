@@ -8,6 +8,7 @@ import ProductDetails from './pages/ProductDetails'
 import CreateListing from './pages/CreateListing'
 import Listings from './pages/Listings'
 import EditListing from './pages/EditListing'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/listings/:id" element={<ProductDetails />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/edit-listing/:id" element={<EditListing />} />
+          <Route path="/profile" element={<Profile />} />
 
         </Routes>
         
