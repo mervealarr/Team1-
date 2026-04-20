@@ -11,5 +11,6 @@ namespace SwapSell.API.Repositories
         Task<Listing?> GetListingByIdAsync(int id);
         Task<bool> UpdateListingAsync(Listing listing);
         Task<bool> DeleteListingAsync(Listing listing);
+        Task<IEnumerable<Listing>> GetListingsByUserIdAsync(int userId);
     }
 }

@@ -48,5 +48,14 @@ namespace SwapSell.API.Repositories
             _context.Listings.Update(listing);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<IEnumerable<Listing>> GetListingsByUserIdAsync(int userId)
+        {
+            return await _context.Listings
+                .Include(l => l.User)
+                .Where(l => l.UserId == userId)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+        }
     }
 }
