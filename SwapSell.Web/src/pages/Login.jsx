@@ -71,6 +71,9 @@ const Login = () => {
               placeholder="••••••••"
               required 
             />
+            <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+              <Link to="/forgot-password" style={{ fontSize: '0.85rem', color: 'var(--primary-color)', textDecoration: 'none' }}>Şifremi Unuttum?</Link>
+            </div>
           </div>
           
           <button type="submit" className="btn btn-primary btn-block">Giriş Yap</button>

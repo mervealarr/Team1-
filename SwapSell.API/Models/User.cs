@@ -16,5 +16,14 @@ namespace SwapSell.API.Models
         
         [Required]
         public string Role { get; set; } = "User";
+
+        public string? ResetPasswordToken { get; set; }
+        
+        public DateTime? ResetPasswordTokenExpiry { get; set; }
+
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Phone { get; set; }
+        public string? Bio { get; set; }
     }
 }

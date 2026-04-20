@@ -9,5 +9,7 @@ namespace SwapSell.API.Services
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
         Task<User?> RegisterAsync(RegisterDto registerDto);
         string GenerateJwtToken(User user);
+        Task<string?> ForgotPasswordAsync(string email);
+        Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     }
 }

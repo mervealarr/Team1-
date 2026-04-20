@@ -41,6 +41,10 @@ export const deleteAccount = () => {
   return api.delete('/user/delete');
 };
 
+export const updateProfile = (profileData) => {
+  return api.put('/user/profile', profileData);
+};
+
 // Admin Endpoints
 export const getAllUsers = () => {
   return api.get('/admin/users');

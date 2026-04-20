@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api';
+import api, { updateProfile } from '../api';
 import './Profile.css';
 
 const Profile = () => {
@@ -11,6 +11,16 @@ const Profile = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteReasons, setDeleteReasons] = useState([]);
   const [otherReasonText, setOtherReasonText] = useState('');
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    bio: ''
+  });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +37,12 @@ const Profile = () => {
       setLoading(true);
       const res = await api.get('/user/profile');
       setProfile(res.data);
+      setEditForm({
+        firstName: res.data.firstName || '',
+        lastName: res.data.lastName || '',
+        phone: res.data.phone || '',
+        bio: res.data.bio || ''
+      });
     } catch (err) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -35,6 +51,20 @@ const Profile = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      setUpdateLoading(true);
+      await updateProfile(editForm);
+      await fetchProfile(); // refresh data
+      setIsEditing(false);
+    } catch (err) {
+      setError('Profil güncellenirken bir hata oluştu.');
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -110,41 +140,91 @@ const Profile = () => {
   return (
     <div className="profile-container">
       {/* Profile Header */}
-      <div className="profile-header">
+      <div className="profile-header" style={{ alignItems: isEditing ? 'flex-start' : 'center' }}>
         <div className="profile-avatar">
-          {getInitial(profile.email)}
+          {getInitial(profile.firstName || profile.email)}
         </div>
 
-        <div className="profile-info">
-          <h1 className="profile-name">{profile.email.split('@')[0]}</h1>
-          <div className="profile-email">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-            </svg>
-            {profile.email}
-          </div>
-          <div className="profile-badges">
-            <span className="profile-badge badge-role">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
+        {isEditing ? (
+          <form className="profile-edit-form" onSubmit={handleUpdateProfile} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0' }}>Profili Düzenle</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Ad</label>
+                <input type="text" value={editForm.firstName} onChange={e => setEditForm({...editForm, firstName: e.target.value})} placeholder="Adınız" />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Soyad</label>
+                <input type="text" value={editForm.lastName} onChange={e => setEditForm({...editForm, lastName: e.target.value})} placeholder="Soyadınız" />
+              </div>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Telefon</label>
+              <input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} placeholder="05XX XXX XX XX" />
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Hakkımda</label>
+              <textarea value={editForm.bio} onChange={e => setEditForm({...editForm, bio: e.target.value})} placeholder="Kendinizden bahsedin..." rows="3" style={{ resize: 'vertical' }}></textarea>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setIsEditing(false)} disabled={updateLoading}>İptal</button>
+              <button type="submit" className="btn btn-primary" disabled={updateLoading}>{updateLoading ? 'Kaydediliyor...' : 'Kaydet'}</button>
+            </div>
+          </form>
+        ) : (
+          <div className="profile-info">
+            <h1 className="profile-name">
+              {profile.firstName || profile.lastName 
+                ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() 
+                : profile.email.split('@')[0]}
+            </h1>
+            
+            {profile.bio && <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0.75rem 0', fontSize: '0.95rem' }}>{profile.bio}</p>}
+            
+            <div className="profile-email" style={{ marginBottom: '0.5rem' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
               </svg>
-              {profile.role === 'Admin' ? 'Yönetici' : 'Kullanıcı'}
-            </span>
-            <span className="profile-badge badge-listings">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-              </svg>
-              {profile.totalListings} İlan
-            </span>
-          </div>
-        </div>
+              {profile.email}
+            </div>
 
-        <div className="profile-actions">
+            {profile.phone && (
+              <div className="profile-email" style={{ marginBottom: '0.5rem' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                {profile.phone}
+              </div>
+            )}
+
+            <div className="profile-badges">
+              <span className="profile-badge badge-role">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {profile.role === 'Admin' ? 'Yönetici' : 'Kullanıcı'}
+              </span>
+              <span className="profile-badge badge-listings">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                </svg>
+                {profile.totalListings} İlan
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="profile-actions" style={{ alignSelf: 'flex-start' }}>
+          {!isEditing && (
+            <button className="btn btn-secondary" onClick={() => setIsEditing(true)}>
+              ✏️ Düzenle
+            </button>
+          )}
           <Link to="/create-listing" className="btn btn-primary">
             + Yeni İlan
           </Link>

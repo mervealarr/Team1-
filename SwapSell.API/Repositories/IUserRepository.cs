@@ -11,5 +11,6 @@ namespace SwapSell.API.Repositories
         Task<User> CreateUserAsync(User user);
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task DeleteUserAsync(User user);
+        Task UpdateUserAsync(User user);
     }
 }

@@ -78,5 +78,49 @@ namespace SwapSell.API.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<string?> ForgotPasswordAsync(string email)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Generate a secure random token
+            var token = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+            user.ResetPasswordToken = token;
+            user.ResetPasswordTokenExpiry = DateTime.UtcNow.AddHours(1);
+
+            await _userRepository.UpdateUserAsync(user);
+
+            // In a real application, send an email with the token
+            // For now, return it so the API can provide it to the client
+            return token;
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(resetPasswordDto.Email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            if (user.ResetPasswordToken != resetPasswordDto.Token || 
+                user.ResetPasswordTokenExpiry == null || 
+                user.ResetPasswordTokenExpiry < DateTime.UtcNow)
+            {
+                return false;
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.NewPassword);
+            user.ResetPasswordToken = null;
+            user.ResetPasswordTokenExpiry = null;
+
+            await _userRepository.UpdateUserAsync(user);
+
+            return true;
+        }
     }
 }

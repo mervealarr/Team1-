@@ -56,11 +56,40 @@ namespace SwapSell.API.Controllers
                 Id = user.Id,
                 Email = user.Email,
                 Role = user.Role,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Bio = user.Bio,
                 TotalListings = listingDtos.Count,
                 Listings = listingDtos
             };
 
             return Ok(profile);
+        }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto updateDto)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new { message = "Invalid user token." });
+            }
+
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            user.FirstName = updateDto.FirstName;
+            user.LastName = updateDto.LastName;
+            user.Phone = updateDto.Phone;
+            user.Bio = updateDto.Bio;
+
+            await _userRepository.UpdateUserAsync(user);
+
+            return Ok(new { message = "Profile updated successfully." });
         }
 
         [HttpDelete("delete")]

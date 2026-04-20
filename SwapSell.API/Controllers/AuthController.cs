@@ -39,5 +39,35 @@ namespace SwapSell.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            var token = await _authService.ForgotPasswordAsync(forgotPasswordDto.Email);
+            if (token == null)
+            {
+                // In a real app, don't reveal that the user does not exist
+                return Ok(new { message = "If your email is registered, you will receive a password reset link." });
+            }
+
+            // Return the token for local development testing
+            return Ok(new 
+            { 
+                message = "If your email is registered, you will receive a password reset link.",
+                resetToken = token // WARNING: Only for local testing! Remove in production.
+            });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var success = await _authService.ResetPasswordAsync(resetPasswordDto);
+            if (!success)
+            {
+                return BadRequest(new { message = "Invalid token or token has expired." });
+            }
+
+            return Ok(new { message = "Password has been successfully reset." });
+        }
     }
 }
