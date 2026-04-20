@@ -23,7 +23,7 @@ namespace SwapSell.API.Services
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            await context.Database.MigrateAsync(cancellationToken);
+            await context.Database.EnsureCreatedAsync(cancellationToken);
 
             if (!await context.Users.AnyAsync(cancellationToken))
             {
