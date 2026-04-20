@@ -30,16 +30,26 @@ namespace SwapSell.API.Services
                 var adminUser = new User
                 {
                     Email = "demo@swapsell.com",
-                    PasswordHash = "$2a$11$w.Q.8b7T9c.BvUjR3m/yKOhv7J6kE6S4WzR6Y4jTQG9cQeXhP3D.G", // Dummy hash for "password"
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), // Hash for "password"
                     Role = "Admin"
                 };
+                
+                var normalUser = new User
+                {
+                    Email = "user@swapsell.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), // Hash for "password"
+                    Role = "User"
+                };
+
                 context.Users.Add(adminUser);
+                context.Users.Add(normalUser);
                 await context.SaveChangesAsync(cancellationToken);
             }
 
             if (!await context.Listings.AnyAsync(cancellationToken))
             {
-                var user = await context.Users.FirstAsync(cancellationToken);
+                var admin = await context.Users.FirstOrDefaultAsync(u => u.Email == "demo@swapsell.com", cancellationToken);
+                var normalUser = await context.Users.FirstOrDefaultAsync(u => u.Email == "user@swapsell.com", cancellationToken);
                 
                 var dummyListings = new[]
                 {
@@ -50,8 +60,9 @@ namespace SwapSell.API.Services
                         Category = "Elektronik",
                         Price = 45000m,
                         ImageUrl = "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
-                        UserId = user.Id,
-                        CreatedAt = DateTime.UtcNow.AddDays(-2)
+                        UserId = admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddDays(-2),
+                        IsApproved = true
                     },
                     new Listing
                     {
@@ -60,8 +71,9 @@ namespace SwapSell.API.Services
                         Category = "Elektronik",
                         Price = 32500m,
                         ImageUrl = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
-                        UserId = user.Id,
-                        CreatedAt = DateTime.UtcNow.AddDays(-1)
+                        UserId = normalUser?.Id ?? admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddDays(-1),
+                        IsApproved = true
                     },
                     new Listing
                     {
@@ -70,8 +82,9 @@ namespace SwapSell.API.Services
                         Category = "Mobilya",
                         Price = 18000m,
                         ImageUrl = "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&w=800&q=80",
-                        UserId = user.Id,
-                        CreatedAt = DateTime.UtcNow.AddHours(-12)
+                        UserId = normalUser?.Id ?? admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddHours(-12),
+                        IsApproved = true
                     },
                     new Listing
                     {
@@ -80,8 +93,20 @@ namespace SwapSell.API.Services
                         Category = "Elektronik",
                         Price = 15500m,
                         ImageUrl = "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80",
-                        UserId = user.Id,
-                        CreatedAt = DateTime.UtcNow.AddHours(-5)
+                        UserId = admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddHours(-5),
+                        IsApproved = true
+                    },
+                    new Listing
+                    {
+                        Title = "Dyson V15 Süpürge",
+                        Description = "Kutusunda sıfır ayarında, ihtiyaç fazlası olduğu için satıyorum. Garanti belgesi mevcut.",
+                        Category = "Elektronik",
+                        Price = 25000m,
+                        ImageUrl = "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=800&q=80",
+                        UserId = normalUser?.Id ?? admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+                        IsApproved = false // ONAY BEKLEYEN ÖRNEK İLAN
                     }
                 };
 

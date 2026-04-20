@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
+import { parseJwt } from '../utils';
 import './Auth.css'; // Shared CSS for Login and Register
 
 const Login = () => {
@@ -17,9 +18,18 @@ const Login = () => {
       const response = await api.post('/auth/login', { email, password });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
+        
+        const payload = parseJwt(response.data.token);
+        const role = payload?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload?.role;
+        
         // also could store user info
         window.dispatchEvent(new Event('auth-change'));
-        navigate('/');
+
+        if (role === 'Admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {

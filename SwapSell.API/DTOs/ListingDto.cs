@@ -53,6 +53,7 @@ namespace SwapSell.API.DTOs
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public bool IsApproved { get; set; }
         public int SellerId { get; set; }
         public string SellerEmail { get; set; } = string.Empty;
     }

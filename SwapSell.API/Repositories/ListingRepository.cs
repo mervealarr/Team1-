@@ -22,7 +22,25 @@ namespace SwapSell.API.Repositories
             return listing;
         }
 
-        public async Task<IEnumerable<Listing>> GetAllListingsAsync()
+        public async Task<IEnumerable<Listing>> GetAllListingsAsync(int? currentUserId = null)
+        {
+            var query = _context.Listings.Include(l => l.User).AsQueryable();
+
+            if (currentUserId.HasValue)
+            {
+                query = query.Where(l => l.IsApproved || l.UserId == currentUserId.Value);
+            }
+            else
+            {
+                query = query.Where(l => l.IsApproved);
+            }
+
+            return await query
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Listing>> GetAllListingsAdminAsync()
         {
             return await _context.Listings
                 .Include(l => l.User)

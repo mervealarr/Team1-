@@ -29,6 +29,8 @@ namespace SwapSell.API.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public bool IsApproved { get; set; } = false;
+
         [Required]
         public int UserId { get; set; }
 

@@ -9,6 +9,8 @@ const Profile = () => {
   const [error, setError] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteReasons, setDeleteReasons] = useState([]);
+  const [otherReasonText, setOtherReasonText] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +41,8 @@ const Profile = () => {
   const handleDeleteAccount = async () => {
     try {
       setDeleting(true);
+      // We could pass the reasons to the backend here if the API supported it
+      // const payload = { reasons: deleteReasons, otherText: deleteReasons.includes('other') ? otherReasonText : '' };
       await api.delete('/user/delete');
       localStorage.removeItem('token');
       window.dispatchEvent(new Event('auth-change'));
@@ -70,6 +74,14 @@ const Profile = () => {
 
   const getInitial = (email) => {
     return email ? email.charAt(0).toUpperCase() : '?';
+  };
+
+  const toggleReason = (reasonId) => {
+    if (deleteReasons.includes(reasonId)) {
+      setDeleteReasons(deleteReasons.filter(r => r !== reasonId));
+    } else {
+      setDeleteReasons([...deleteReasons, reasonId]);
+    }
   };
 
   if (loading) {
@@ -217,6 +229,23 @@ const Profile = () => {
                   <span className="listing-card-category">
                     {listing.category}
                   </span>
+                  {!listing.isApproved && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '0.5rem',
+                      right: '0.5rem',
+                      background: 'rgba(234, 179, 8, 0.95)',
+                      color: '#fff',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      zIndex: 10
+                    }}>
+                      ⏳ Onay Bekliyor
+                    </span>
+                  )}
                 </div>
 
                 <div className="listing-card-body">
@@ -255,14 +284,76 @@ const Profile = () => {
           className="modal-overlay"
           onClick={() => !deleting && setShowDeleteModal(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon">🗑️</div>
-            <h3 className="modal-title">Hesabı Silmek İstediğinize Emin Misiniz?</h3>
-            <p className="modal-text">
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', textAlign: 'left' }}>
+            <div className="modal-icon" style={{ textAlign: 'center' }}>🗑️</div>
+            <h3 className="modal-title" style={{ textAlign: 'center' }}>Hesabı Silmek İstediğinize Emin Misiniz?</h3>
+            <p className="modal-text" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               Bu işlem geri alınamaz. Hesabınız ve tüm ilanlarınız kalıcı olarak
-              silinecektir.
+              silinecektir. Lütfen hesabınızı neden silmek istediğinizi belirtin:
             </p>
-            <div className="modal-actions">
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={deleteReasons.includes('reason1')}
+                  onChange={() => toggleReason('reason1')}
+                />
+                Uygulamayı artık kullanmıyorum
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={deleteReasons.includes('reason2')}
+                  onChange={() => toggleReason('reason2')}
+                />
+                Aradığım ürünleri bulamadım
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={deleteReasons.includes('reason3')}
+                  onChange={() => toggleReason('reason3')}
+                />
+                İstediğim fiyata satış yapamadım
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={deleteReasons.includes('reason4')}
+                  onChange={() => toggleReason('reason4')}
+                />
+                Gizlilik veya güvenlik endişelerim var
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={deleteReasons.includes('other')}
+                  onChange={() => toggleReason('other')}
+                />
+                Diğer
+              </label>
+              
+              {deleteReasons.includes('other') && (
+                <textarea 
+                  placeholder="Lütfen nedeninizi kısaca açıklayın..."
+                  value={otherReasonText}
+                  onChange={(e) => setOtherReasonText(e.target.value)}
+                  style={{ 
+                    marginTop: '0.5rem', 
+                    padding: '0.75rem', 
+                    borderRadius: '0.5rem', 
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
+                    minHeight: '80px',
+                    resize: 'vertical'
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="modal-actions" style={{ justifyContent: 'center' }}>
               <button
                 className="btn btn-secondary"
                 onClick={() => setShowDeleteModal(false)}
@@ -273,7 +364,7 @@ const Profile = () => {
               <button
                 className="btn btn-danger"
                 onClick={handleDeleteAccount}
-                disabled={deleting}
+                disabled={deleting || (deleteReasons.length === 0)}
               >
                 {deleting ? 'Siliniyor...' : 'Evet, Sil'}
               </button>

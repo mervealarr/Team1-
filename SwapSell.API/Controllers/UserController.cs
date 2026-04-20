@@ -46,6 +46,7 @@ namespace SwapSell.API.Controllers
                 Price = l.Price,
                 ImageUrl = l.ImageUrl,
                 CreatedAt = l.CreatedAt,
+                IsApproved = l.IsApproved,
                 SellerId = l.UserId,
                 SellerEmail = l.User?.Email ?? ""
             }).ToList();

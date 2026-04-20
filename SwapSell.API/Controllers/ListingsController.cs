@@ -24,7 +24,14 @@ namespace SwapSell.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ListingResponseDto>>> GetAll()
         {
-            var listings = await _listingService.GetAllListingsAsync();
+            int? currentUserId = null;
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userIdStr) && int.TryParse(userIdStr, out int userId))
+            {
+                currentUserId = userId;
+            }
+
+            var listings = await _listingService.GetAllListingsAsync(currentUserId);
             return Ok(listings);
         }
 

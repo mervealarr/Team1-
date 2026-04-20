@@ -41,4 +41,25 @@ export const deleteAccount = () => {
   return api.delete('/user/delete');
 };
 
+// Admin Endpoints
+export const getAllUsers = () => {
+  return api.get('/admin/users');
+};
+
+export const getAdminListings = () => {
+  return api.get('/admin/listings');
+};
+
+export const adminDeleteUser = (id) => {
+  return api.delete(`/admin/users/${id}`);
+};
+
+export const adminDeleteListing = (id) => {
+  return api.delete(`/admin/listings/${id}`);
+};
+
+export const moderateListing = (id, isApproved) => {
+  return api.put(`/admin/listings/${id}/moderate`, { isApproved });
+};
+
 export default api;

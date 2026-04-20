@@ -88,10 +88,27 @@ const FeaturedItems = () => {
         <div className="items-grid">
           {filteredItems.map((item) => (
             <div key={item.id} className="item-card glass" onClick={() => navigate(`/listings/${item.id}`)} style={{ cursor: 'pointer' }}>
-              <div className="item-image-container">
+              <div className="item-image-container" style={{ position: 'relative' }}>
                 {/* Fallback placeholder image initially since uploading isn't implemented */}
                 <img src={item.imageUrl || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80"} alt={item.title} className="item-image" />
                 <span className="item-condition">İkinci El</span>
+                {!item.isApproved && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '0.5rem',
+                    right: '0.5rem',
+                    background: 'rgba(234, 179, 8, 0.95)',
+                    color: '#fff',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    zIndex: 10
+                  }}>
+                    ⏳ Onay Bekliyor
+                  </span>
+                )}
               </div>
               
               <div className="item-details">

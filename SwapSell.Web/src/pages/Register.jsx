@@ -8,6 +8,7 @@ const Register = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -20,7 +21,8 @@ const Register = () => {
         firstName, 
         lastName, 
         email, 
-        password 
+        password,
+        role: isAdmin ? 'Admin' : 'User'
       });
       // automatically redirect to login or login directly
       navigate('/login');
@@ -89,6 +91,17 @@ const Register = () => {
               required 
               minLength="6"
             />
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <input 
+              type="checkbox" 
+              id="isAdmin" 
+              checked={isAdmin}
+              onChange={(e) => setIsAdmin(e.target.checked)}
+              style={{ width: 'auto' }}
+            />
+            <label htmlFor="isAdmin" style={{ margin: 0, fontWeight: 'normal' }}>Yönetici (Admin) hesabı oluştur</label>
           </div>
           
           <button type="submit" className="btn btn-primary btn-block">Kayıt Ol</button>

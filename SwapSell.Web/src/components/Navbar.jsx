@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { parseJwt } from '../utils';
 import './Navbar.css';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,6 +34,14 @@ const Navbar = () => {
   const checkAuth = () => {
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token);
+
+    if (token) {
+      const payload = parseJwt(token);
+      const role = payload?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload?.role;
+      setIsAdmin(role === 'Admin');
+    } else {
+      setIsAdmin(false);
+    }
   };
 
   useEffect(() => {
@@ -88,6 +98,14 @@ const Navbar = () => {
         <div className="navbar-actions">
           {isAuthenticated ? (
             <>
+              {isAdmin && (
+                <Link to="/admin" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', border: '1px solid var(--primary-color)', color: 'var(--primary-color)' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  Admin Paneli
+                </Link>
+              )}
               <Link to="/profile" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -96,7 +114,7 @@ const Navbar = () => {
                 Profilim
               </Link>
               <button onClick={handleLogout} className="btn btn-secondary">Çıkış Yap</button>
-              <Link to="/create-listing" className="btn btn-primary">İlan Ver</Link>
+              {!isAdmin && <Link to="/create-listing" className="btn btn-primary">İlan Ver</Link>}
             </>
           ) : (
             <>

@@ -54,12 +54,30 @@ const ProductDetails = () => {
       </button>
 
       <div className="product-grid">
-        <div className="product-image-side glass">
+        <div className="product-image-side glass" style={{ position: 'relative' }}>
           <img 
             src={product.imageUrl || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"} 
             alt={product.title} 
             className="product-main-image"
+            style={{ opacity: product.isApproved ? 1 : 0.7 }}
           />
+          {!product.isApproved && (
+            <div style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              background: 'rgba(234, 179, 8, 0.95)',
+              color: '#fff',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              zIndex: 10
+            }}>
+              ⏳ Bu ilan henüz onaylanmamıştır
+            </div>
+          )}
         </div>
 
         <div className="product-info-side glass">

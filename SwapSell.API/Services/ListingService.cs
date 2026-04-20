@@ -39,14 +39,15 @@ namespace SwapSell.API.Services
                 Price = created.Price,
                 ImageUrl = created.ImageUrl,
                 CreatedAt = created.CreatedAt,
+                IsApproved = created.IsApproved,
                 SellerId = created.UserId,
                 SellerEmail = created.User?.Email ?? string.Empty
             };
         }
 
-        public async Task<IEnumerable<ListingResponseDto>> GetAllListingsAsync()
+        public async Task<IEnumerable<ListingResponseDto>> GetAllListingsAsync(int? currentUserId = null)
         {
-            var listings = await _listingRepository.GetAllListingsAsync();
+            var listings = await _listingRepository.GetAllListingsAsync(currentUserId);
             return listings.Select(l => new ListingResponseDto
             {
                 Id = l.Id,
@@ -56,6 +57,7 @@ namespace SwapSell.API.Services
                 Price = l.Price,
                 ImageUrl = l.ImageUrl,
                 CreatedAt = l.CreatedAt,
+                IsApproved = l.IsApproved,
                 SellerId = l.UserId,
                 SellerEmail = l.User?.Email ?? string.Empty
             });
@@ -75,6 +77,7 @@ namespace SwapSell.API.Services
                 Price = listing.Price,
                 ImageUrl = listing.ImageUrl,
                 CreatedAt = listing.CreatedAt,
+                IsApproved = listing.IsApproved,
                 SellerId = listing.UserId,
                 SellerEmail = listing.User?.Email ?? string.Empty
             };
@@ -116,6 +119,7 @@ namespace SwapSell.API.Services
                 Price = listing.Price,
                 ImageUrl = listing.ImageUrl,
                 CreatedAt = listing.CreatedAt,
+                IsApproved = listing.IsApproved,
                 SellerId = listing.UserId,
                 SellerEmail = listing.User?.Email ?? string.Empty
             };

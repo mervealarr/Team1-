@@ -9,6 +9,7 @@ import CreateListing from './pages/CreateListing'
 import Listings from './pages/Listings'
 import EditListing from './pages/EditListing'
 import Profile from './pages/Profile'
+import AdminDashboard from './pages/AdminDashboard'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/edit-listing/:id" element={<EditListing />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<AdminDashboard />} />
 
         </Routes>
         

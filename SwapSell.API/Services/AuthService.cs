@@ -34,7 +34,7 @@ namespace SwapSell.API.Services
             {
                 Email = registerDto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                Role = "User"
+                Role = string.IsNullOrEmpty(registerDto.Role) ? "User" : registerDto.Role
             };
 
             return await _userRepository.CreateUserAsync(user);
