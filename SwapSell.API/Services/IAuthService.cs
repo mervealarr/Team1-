@@ -11,5 +11,6 @@ namespace SwapSell.API.Services
         string GenerateJwtToken(User user);
         Task<string?> ForgotPasswordAsync(string email);
         Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
+        Task<bool> ActivateEmailAsync(string email, string token);
     }
 }

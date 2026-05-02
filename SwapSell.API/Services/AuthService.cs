@@ -15,11 +15,13 @@ namespace SwapSell.API.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public AuthService(IUserRepository userRepository, IConfiguration configuration)
+        public AuthService(IUserRepository userRepository, IConfiguration configuration, IEmailService emailService)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<User?> RegisterAsync(RegisterDto registerDto)
@@ -30,14 +32,32 @@ namespace SwapSell.API.Services
                 return null;
             }
 
+            var activationToken = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+
             var user = new User
             {
                 Email = registerDto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                Role = string.IsNullOrEmpty(registerDto.Role) ? "User" : registerDto.Role
+                Role = string.IsNullOrEmpty(registerDto.Role) ? "User" : registerDto.Role,
+                IsEmailConfirmed = false,
+                EmailActivationToken = activationToken,
+                EmailActivationTokenExpiry = DateTime.UtcNow.AddDays(1)
             };
 
-            return await _userRepository.CreateUserAsync(user);
+            var createdUser = await _userRepository.CreateUserAsync(user);
+
+            // Send activation email
+            var apiBaseUrl = _configuration["AppUrls:ApiBaseUrl"] ?? "http://localhost:5237";
+            var activationLink = $"{apiBaseUrl}/api/auth/activate-email?email={user.Email}&token={Uri.EscapeDataString(activationToken)}";
+            var emailBody = $@"
+                <h2>Welcome to SwapSell!</h2>
+                <p>Please activate your account by clicking the link below:</p>
+                <p><a href='{activationLink}'>Activate Account</a></p>
+                <p>If the link doesn't work, you can copy and paste this token in the activation page: <b>{activationToken}</b></p>
+            ";
+            await _emailService.SendEmailAsync(user.Email, "SwapSell - Activate Your Account", emailBody);
+
+            return createdUser;
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
@@ -47,6 +67,11 @@ namespace SwapSell.API.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
             {
                 return null;
+            }
+
+            if (!user.IsEmailConfirmed)
+            {
+                throw new UnauthorizedAccessException("Lütfen önce e-postanızı onaylayın.");
             }
 
             var token = GenerateJwtToken(user);
@@ -117,6 +142,35 @@ namespace SwapSell.API.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.NewPassword);
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenExpiry = null;
+
+            await _userRepository.UpdateUserAsync(user);
+
+            return true;
+        }
+
+        public async Task<bool> ActivateEmailAsync(string email, string token)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            if (user.IsEmailConfirmed)
+            {
+                return true; // Already confirmed
+            }
+
+            if (user.EmailActivationToken != token || 
+                user.EmailActivationTokenExpiry == null || 
+                user.EmailActivationTokenExpiry < DateTime.UtcNow)
+            {
+                return false;
+            }
+
+            user.IsEmailConfirmed = true;
+            user.EmailActivationToken = null;
+            user.EmailActivationTokenExpiry = null;
 
             await _userRepository.UpdateUserAsync(user);
 

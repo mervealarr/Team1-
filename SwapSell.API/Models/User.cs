@@ -21,6 +21,12 @@ namespace SwapSell.API.Models
         
         public DateTime? ResetPasswordTokenExpiry { get; set; }
 
+        public bool IsEmailConfirmed { get; set; } = false;
+        
+        public string? EmailActivationToken { get; set; }
+        
+        public DateTime? EmailActivationTokenExpiry { get; set; }
+
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Phone { get; set; }

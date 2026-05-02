@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using SwapSell.API.DTOs;
 using SwapSell.API.Services;
 
@@ -10,10 +11,12 @@ namespace SwapSell.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IConfiguration configuration)
         {
             _authService = authService;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -31,13 +34,20 @@ namespace SwapSell.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var response = await _authService.LoginAsync(loginDto);
-            if (response == null)
+            try
             {
-                return Unauthorized(new { message = "Invalid email or password." });
-            }
+                var response = await _authService.LoginAsync(loginDto);
+                if (response == null)
+                {
+                    return Unauthorized(new { message = "Invalid email or password." });
+                }
 
-            return Ok(response);
+                return Ok(response);
+            }
+            catch (System.UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
         }
 
         [HttpPost("forgot-password")]
@@ -68,6 +78,25 @@ namespace SwapSell.API.Controllers
             }
 
             return Ok(new { message = "Password has been successfully reset." });
+        }
+
+        [HttpGet("activate-email")]
+        public async Task<IActionResult> ActivateEmail([FromQuery] string email, [FromQuery] string token)
+        {
+            var frontendUrl = _configuration["AppUrls:FrontendBaseUrl"] ?? "http://localhost:5173";
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+            {
+                return Redirect($"{frontendUrl}/login?error=invalid_request");
+            }
+
+            var success = await _authService.ActivateEmailAsync(email, token);
+            if (!success)
+            {
+                return Redirect($"{frontendUrl}/login?error=activation_failed");
+            }
+
+            return Redirect($"{frontendUrl}/login?activated=true");
         }
     }
 }
