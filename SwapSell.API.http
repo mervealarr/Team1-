@@ -1,0 +1,6 @@
+@SwapSell.API_HostAddress = http://localhost:5237
+
+GET {{SwapSell.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
