@@ -90,4 +90,20 @@ export const getInboxMessages = async () => {
   return response.data;
 };
 
+// Favorites Endpoints
+export const toggleFavorite = async (listingId) => {
+  const response = await api.post(`/favorites/${listingId}`);
+  return response.data;
+};
+
+export const getFavorites = async () => {
+  const response = await api.get('/favorites');
+  return response.data;
+};
+
+export const getFavoriteIds = async () => {
+  const response = await api.get('/favorites/ids');
+  return response.data;
+};
+
 export default api;

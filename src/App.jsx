@@ -12,6 +12,7 @@ import Profile from './pages/Profile'
 import AdminDashboard from './pages/AdminDashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import MyFavorites from './pages/MyFavorites'
 import SendMessage from './pages/SendMessage'
 import Inbox from './pages/Inbox'
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/edit-listing/:id" element={<EditListing />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/favorites" element={<MyFavorites />} />
         </Routes>
 
         <footer

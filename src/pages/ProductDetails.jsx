@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { getCurrentUserId } from '../api';
+import api, { getCurrentUserId, getFavoriteIds, toggleFavorite } from '../api';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
@@ -10,6 +10,8 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isOwner, setIsOwner] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const currentUserId = getCurrentUserId();
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -20,6 +22,13 @@ const ProductDetails = () => {
         const currentUserId = getCurrentUserId();
         if (currentUserId && Number(currentUserId) === Number(response.data.sellerId)) {
           setIsOwner(true);
+        }
+
+        if (currentUserId) {
+          const favIds = await getFavoriteIds();
+          if (favIds.includes(Number(id))) {
+            setIsFavorite(true);
+          }
         }
       } catch (err) {
         setError('Ürün detayları yüklenemedi veya ürün bulunamadı.');
@@ -48,6 +57,19 @@ const ProductDetails = () => {
 
   const handleContactSeller = () => {
     navigate(`/inbox?receiverId=${product.sellerId}&listingId=${product.id}`);
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!currentUserId) {
+      alert("Favorilere eklemek için giriş yapmalısınız.");
+      return;
+    }
+    try {
+      const response = await toggleFavorite(id);
+      setIsFavorite(response.isFavorite);
+    } catch (err) {
+      console.error("Favori işlemi başarısız", err);
+    }
   };
 
   return (
@@ -117,8 +139,12 @@ const ProductDetails = () => {
                 <button onClick={handleContactSeller} className="btn btn-primary btn-lg action-btn">
                   İlan Sahibiyle İletişime Geç
                 </button>
-                <button className="btn btn-secondary btn-lg action-btn">
-                  Favorilere Ekle
+                <button 
+                  onClick={handleToggleFavorite} 
+                  className="btn btn-secondary btn-lg action-btn"
+                  style={{ color: isFavorite ? 'red' : 'inherit' }}
+                >
+                  {isFavorite ? '❤️ Favorilerden Çıkar' : '🤍 Favorilere Ekle'}
                 </button>
               </>
             )}

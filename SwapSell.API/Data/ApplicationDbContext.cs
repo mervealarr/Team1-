@@ -9,6 +9,7 @@ namespace SwapSell.API.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Listing> Listings { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,18 @@ namespace SwapSell.API.Data
                 .HasOne(l => l.User)
                 .WithMany()
                 .HasForeignKey(l => l.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Favorite>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Favorite>()
+                .HasOne(f => f.Listing)
+                .WithMany()
+                .HasForeignKey(f => f.ListingId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

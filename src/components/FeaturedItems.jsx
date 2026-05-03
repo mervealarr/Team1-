@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { getCurrentUserId } from '../api';
+import api, { getCurrentUserId, getFavoriteIds, toggleFavorite } from '../api';
 import './FeaturedItems.css';
 
 const FeaturedItems = () => {
@@ -8,6 +8,7 @@ const FeaturedItems = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [favoriteIds, setFavoriteIds] = useState([]);
 
   const navigate = useNavigate();
   const currentUserId = getCurrentUserId();
@@ -17,6 +18,11 @@ const FeaturedItems = () => {
       try {
         const response = await api.get('/listings');
         setItems(response.data);
+
+        if (currentUserId) {
+          const favResponse = await getFavoriteIds();
+          setFavoriteIds(favResponse);
+        }
       } catch (err) {
         console.error("Ürünler yüklenemedi", err);
       } finally {
@@ -25,7 +31,26 @@ const FeaturedItems = () => {
     };
 
     fetchListings();
-  }, []);
+  }, [currentUserId]);
+
+  const handleToggleFavorite = async (e, listingId) => {
+    e.stopPropagation();
+    if (!currentUserId) {
+      alert("Favorilere eklemek için giriş yapmalısınız.");
+      return;
+    }
+    
+    try {
+      const { isFavorite } = await toggleFavorite(listingId);
+      if (isFavorite) {
+        setFavoriteIds([...favoriteIds, listingId]);
+      } else {
+        setFavoriteIds(favoriteIds.filter(id => id !== listingId));
+      }
+    } catch (err) {
+      console.error("Favori işlemi başarısız", err);
+    }
+  };
 
   const filteredItems = items.filter(item => {
     const query = searchQuery.toLowerCase();
@@ -211,20 +236,10 @@ const FeaturedItems = () => {
 
                     <button
                       className="action-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+                      onClick={(e) => handleToggleFavorite(e, item.id)}
+                      style={{ color: favoriteIds.includes(item.id) ? 'red' : 'inherit' }}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                      </svg>
+                      {favoriteIds.includes(item.id) ? '❤️' : '🤍'}
                     </button>
                   </div>
                 </div>

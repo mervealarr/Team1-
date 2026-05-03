@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import api, { getCurrentUserId } from '../api';
+import api, { getCurrentUserId, getFavoriteIds, toggleFavorite } from '../api';
 import '../components/FeaturedItems.css';
 
 const Listings = () => {
@@ -9,6 +9,7 @@ const Listings = () => {
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState([]);
 
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCondition, setSelectedCondition] = useState('All');
@@ -25,6 +26,11 @@ const Listings = () => {
       try {
         const response = await api.get('/listings');
         setItems(response.data);
+
+        if (currentUserId) {
+          const favResponse = await getFavoriteIds();
+          setFavoriteIds(favResponse);
+        }
       } catch (err) {
         console.error("Ürünler yüklenemedi", err);
       } finally {
@@ -33,7 +39,26 @@ const Listings = () => {
     };
 
     fetchListings();
-  }, []);
+  }, [currentUserId]);
+
+  const handleToggleFavorite = async (e, listingId) => {
+    e.stopPropagation();
+    if (!currentUserId) {
+      alert("Favorilere eklemek için giriş yapmalısınız.");
+      return;
+    }
+    
+    try {
+      const { isFavorite } = await toggleFavorite(listingId);
+      if (isFavorite) {
+        setFavoriteIds([...favoriteIds, listingId]);
+      } else {
+        setFavoriteIds(favoriteIds.filter(id => id !== listingId));
+      }
+    } catch (err) {
+      console.error("Favori işlemi başarısız", err);
+    }
+  };
 
   const filteredItems = items.filter(item => {
     const q = queryParam.toLowerCase();
@@ -249,9 +274,10 @@ const Listings = () => {
 
                       <button
                         className="action-btn"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => handleToggleFavorite(e, item.id)}
+                        style={{ color: favoriteIds.includes(item.id) ? 'red' : 'inherit' }}
                       >
-                        ❤
+                        {favoriteIds.includes(item.id) ? '❤️' : '🤍'}
                       </button>
                     </div>
                   </div>

@@ -12,9 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Use SQLite for local development when PostgreSQL is not available
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("Host=localhost"))
+
+if (string.IsNullOrEmpty(connectionString))
 {
-    // Fallback to SQLite
+    // Sadece connection string tamamen boşsa SQLite kullan
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlite("Data Source=SwapSell.db"));
 }
