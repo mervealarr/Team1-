@@ -7,23 +7,31 @@ const api = axios.create({
   },
 });
 
-// Optionally attach token if exists in localStorage
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
 export const parseJwt = (token) => {
   if (!token) return null;
+
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
 
     return JSON.parse(jsonPayload);
   } catch (error) {
@@ -34,7 +42,12 @@ export const parseJwt = (token) => {
 export const getCurrentUserId = () => {
   const token = localStorage.getItem('token');
   const payload = parseJwt(token);
-  return payload && payload.sub ? parseInt(payload.sub, 10) : null;
+
+  return Number(
+    payload?.sub ||
+    payload?.nameid ||
+    payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+  ) || null;
 };
 
 export const deleteAccount = () => {
@@ -64,6 +77,17 @@ export const adminDeleteListing = (id) => {
 
 export const moderateListing = (id, isApproved) => {
   return api.put(`/admin/listings/${id}/moderate`, { isApproved });
+};
+
+// Message Endpoints
+export const sendMessage = async (messageData) => {
+  const response = await api.post('/messages', messageData);
+  return response.data;
+};
+
+export const getInboxMessages = async () => {
+  const response = await api.get('/messages/inbox');
+  return response.data;
 };
 
 export default api;

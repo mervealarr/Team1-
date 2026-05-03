@@ -50,7 +50,7 @@ const Navbar = () => {
     return () => {
       window.removeEventListener('auth-change', checkAuth);
     };
-  }, [location.pathname]); // verify on route change too
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -78,11 +78,11 @@ const Navbar = () => {
         <Link to="/" className="navbar-logo">
           Swap<span>Sell</span>
         </Link>
-        
+
         <div className="navbar-search">
-          <input 
-            type="text" 
-            placeholder="Ürün, kategori veya marka ara..." 
+          <input
+            type="text"
+            placeholder="Ürün, kategori veya marka ara..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -106,6 +106,11 @@ const Navbar = () => {
                   Admin Paneli
                 </Link>
               )}
+
+              <Link to="/inbox" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                💬 Mesajlarım
+              </Link>
+
               <Link to="/profile" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -113,6 +118,7 @@ const Navbar = () => {
                 </svg>
                 Profilim
               </Link>
+
               <button onClick={handleLogout} className="btn btn-secondary">Çıkış Yap</button>
               {!isAdmin && <Link to="/create-listing" className="btn btn-primary">İlan Ver</Link>}
             </>

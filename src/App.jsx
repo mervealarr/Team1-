@@ -12,13 +12,15 @@ import Profile from './pages/Profile'
 import AdminDashboard from './pages/AdminDashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import SendMessage from './pages/SendMessage'
+import Inbox from './pages/Inbox'
 
 function App() {
   return (
     <Router>
       <div className="app-container">
         <Navbar />
-        
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -27,17 +29,40 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/listings/:id" element={<ProductDetails />} />
+          <Route path="/send-message" element={<SendMessage />} />
+          <Route path="/inbox" element={<Inbox />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/edit-listing/:id" element={<EditListing />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminDashboard />} />
-
         </Routes>
-        
-        {/* Simple Footer */}
-        <footer style={{ marginTop: 'auto', padding: '2rem 5%', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>© 2026 SwapSell. Tüm hakları saklıdır.</p>
-          <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-secondary)' }}>
+
+        <footer
+          style={{
+            marginTop: 'auto',
+            padding: '2rem 5%',
+            borderTop: '1px solid var(--border-color)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: '0.9rem'
+            }}
+          >
+            © 2026 SwapSell. Tüm hakları saklıdır.
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              color: 'var(--text-secondary)'
+            }}
+          >
             <a href="#">Gizlilik Politikası</a>
             <a href="#">Kullanım Şartları</a>
           </div>

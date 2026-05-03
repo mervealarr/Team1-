@@ -16,11 +16,10 @@ const ProductDetails = () => {
       try {
         const response = await api.get(`/listings/${id}`);
         setProduct(response.data);
-        
-        // Check ownership
+
         const currentUserId = getCurrentUserId();
-        if (currentUserId && currentUserId === response.data.sellerId) {
-            setIsOwner(true);
+        if (currentUserId && Number(currentUserId) === Number(response.data.sellerId)) {
+          setIsOwner(true);
         }
       } catch (err) {
         setError('Ürün detayları yüklenemedi veya ürün bulunamadı.');
@@ -38,13 +37,17 @@ const ProductDetails = () => {
 
   const handleDelete = async () => {
     if (window.confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
-        try {
-            await api.delete(`/listings/${id}`);
-            navigate('/');
-        } catch (err) {
-            alert('İlan silinirken bir hata oluştu.');
-        }
+      try {
+        await api.delete(`/listings/${id}`);
+        navigate('/');
+      } catch (err) {
+        alert('İlan silinirken bir hata oluştu.');
+      }
     }
+  };
+
+  const handleContactSeller = () => {
+    navigate(`/inbox?receiverId=${product.sellerId}&listingId=${product.id}`);
   };
 
   return (
@@ -55,9 +58,9 @@ const ProductDetails = () => {
 
       <div className="product-grid">
         <div className="product-image-side glass" style={{ position: 'relative' }}>
-          <img 
-            src={product.imageUrl || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"} 
-            alt={product.title} 
+          <img
+            src={product.imageUrl || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"}
+            alt={product.title}
             className="product-main-image"
             style={{ opacity: product.isApproved ? 1 : 0.7 }}
           />
@@ -96,26 +99,28 @@ const ProductDetails = () => {
 
           <div className="product-description-container">
             <h3 className="section-title">Ürün Açıklaması</h3>
-            <p className="product-description">
-              {product.description}
-            </p>
+            <p className="product-description">{product.description}</p>
           </div>
 
           <div className="product-actions">
             {isOwner ? (
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button onClick={() => navigate(`/edit-listing/${product.id}`)} className="btn action-btn btn-secondary">
-                        İlanı Düzenle
-                    </button>
-                    <button onClick={handleDelete} className="btn action-btn" style={{ background: 'var(--error)', color: 'white' }}>
-                        İlanı Sil
-                    </button>
-                </div>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button onClick={() => navigate(`/edit-listing/${product.id}`)} className="btn action-btn btn-secondary">
+                  İlanı Düzenle
+                </button>
+                <button onClick={handleDelete} className="btn action-btn" style={{ background: 'var(--error)', color: 'white' }}>
+                  İlanı Sil
+                </button>
+              </div>
             ) : (
-                <>
-                    <button className="btn btn-primary btn-lg action-btn">Satıcıya Mesaj Gönder</button>
-                    <button className="btn btn-secondary btn-lg action-btn">Favorilere Ekle</button>
-                </>
+              <>
+                <button onClick={handleContactSeller} className="btn btn-primary btn-lg action-btn">
+                  İlan Sahibiyle İletişime Geç
+                </button>
+                <button className="btn btn-secondary btn-lg action-btn">
+                  Favorilere Ekle
+                </button>
+              </>
             )}
           </div>
         </div>
