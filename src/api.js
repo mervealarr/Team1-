@@ -17,6 +17,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      // Oturum süresi dolduğunda token'ı siliyoruz. Yönlendirmeyi sayfa bazlı yapıyoruz.
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const parseJwt = (token) => {
   if (!token) return null;
 

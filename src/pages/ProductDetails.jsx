@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { getCurrentUserId, getFavoriteIds, toggleFavorite } from '../api';
 import './ProductDetails.css';
+import ShareComponent from '../components/ShareComponent';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -25,9 +26,14 @@ const ProductDetails = () => {
         }
 
         if (currentUserId) {
-          const favIds = await getFavoriteIds();
-          if (favIds.includes(Number(id))) {
-            setIsFavorite(true);
+          try {
+            const favIds = await getFavoriteIds();
+            if (favIds.includes(Number(id))) {
+              setIsFavorite(true);
+            }
+          } catch (favErr) {
+            console.warn("Favoriler çekilirken hata oluştu, oturum süresi dolmuş olabilir.", favErr);
+            localStorage.removeItem('token');
           }
         }
       } catch (err) {
@@ -106,9 +112,12 @@ const ProductDetails = () => {
         </div>
 
         <div className="product-info-side glass">
-          <div className="product-header">
-            <h1 className="product-title">{product.title}</h1>
-            <p className="product-price">{product.price} ₺</p>
+          <div className="product-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <h1 className="product-title">{product.title}</h1>
+              <p className="product-price">{product.price} ₺</p>
+            </div>
+            <ShareComponent listingId={product.id} />
           </div>
 
           <div className="product-seller-info">

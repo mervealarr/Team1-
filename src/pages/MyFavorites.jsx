@@ -23,7 +23,12 @@ const MyFavorites = () => {
         setItems(response);
       } catch (err) {
         console.error("Favoriler yüklenemedi", err);
-        setError("Favorileriniz yüklenirken bir sorun oluştu.");
+        if (err.response && err.response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        } else {
+          setError("Favorileriniz yüklenirken bir sorun oluştu.");
+        }
       } finally {
         setLoading(false);
       }
