@@ -3,8 +3,8 @@ import './NotificationBell.css';
 
 const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  // Başlangıçta test verileri var
+
+
   const [notifications, setNotifications] = useState([
     { id: 1, message: '📉 Favorilerinizdeki "Mimari Çizim Masası" fiyatı düştü!', isRead: false },
     { id: 2, message: '💬 Yeni bir mesajınız var.', isRead: false }
@@ -12,19 +12,19 @@ const NotificationBell = () => {
 
   useEffect(() => {
     const handleNewNotif = (e) => {
-      // Inbox'tan gelen mesajı listenin en başına ekler
+
       const newNotif = {
         id: Date.now(),
-        message: `✉️ Yeni Mesaj: ${e.detail}`, // e.detail mesajın içeriğidir
+        message: `✉️ Yeni Mesaj: ${e.detail}`,
         isRead: false
       };
       setNotifications(prev => [newNotif, ...prev]);
     };
 
-    // 'new-notification' isimli duyuruyu dinlemeye başla
+
     window.addEventListener('new-notification', handleNewNotif);
 
-    // Bileşen kapandığında dinlemeyi bırak (temizlik)
+
     return () => window.removeEventListener('new-notification', handleNewNotif);
   }, []);
 

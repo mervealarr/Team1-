@@ -11,7 +11,7 @@ const Profile = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteReasons, setDeleteReasons] = useState([]);
   const [otherReasonText, setOtherReasonText] = useState('');
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -59,7 +59,7 @@ const Profile = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      
+
       setUpdateLoading(true);
       await updateProfile(editForm);
       await fetchProfile(); // refresh data
@@ -154,37 +154,37 @@ const Profile = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Ad</label>
-                <input type="text" value={editForm.firstName} onChange={e => setEditForm({...editForm, firstName: e.target.value})} placeholder="Adınız" />
+                <input type="text" value={editForm.firstName} onChange={e => setEditForm({ ...editForm, firstName: e.target.value })} placeholder="Adınız" />
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Soyad</label>
-                <input type="text" value={editForm.lastName} onChange={e => setEditForm({...editForm, lastName: e.target.value})} placeholder="Soyadınız" />
+                <input type="text" value={editForm.lastName} onChange={e => setEditForm({ ...editForm, lastName: e.target.value })} placeholder="Soyadınız" />
               </div>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Telefon</label>
-              <input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} placeholder="05XX XXX XX XX" />
+              <input type="text" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} placeholder="05XX XXX XX XX" />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Hakkımda</label>
-              <textarea value={editForm.bio} onChange={e => setEditForm({...editForm, bio: e.target.value})} placeholder="Kendinizden bahsedin..." rows="3" style={{ resize: 'vertical' }}></textarea>
+              <textarea value={editForm.bio} onChange={e => setEditForm({ ...editForm, bio: e.target.value })} placeholder="Kendinizden bahsedin..." rows="3" style={{ resize: 'vertical' }}></textarea>
               {/* E-posta Bildirim Ayarı */}
-<div className="form-group" style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>
-  <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', padding: '0.5rem 0' }}>
-    <input 
-      type="checkbox" 
-      checked={editForm.emailNotifications} 
-      onChange={e => setEditForm({...editForm, emailNotifications: e.target.checked})}
-      style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--accent-primary)' }}
-    />
-    <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-      Cevapsız mesajlar için e-posta bildirimi al
-    </span>
-  </label>
-  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '2rem', marginTop: '-0.3rem' }}>
-    *Bu ayar aktif olduğunda, 15 dakika boyunca okunmayan mesajlar size mail olarak hatırlatılır.
-  </p>
-</div>
+              <div className="form-group" style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', padding: '0.5rem 0' }}>
+                  <input
+                    type="checkbox"
+                    checked={editForm.emailNotifications}
+                    onChange={e => setEditForm({ ...editForm, emailNotifications: e.target.checked })}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--accent-primary)' }}
+                  />
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                    Cevapsız mesajlar için e-posta bildirimi al
+                  </span>
+                </label>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '2rem', marginTop: '-0.3rem' }}>
+                  *Bu ayar aktif olduğunda, 15 dakika boyunca okunmayan mesajlar size mail olarak hatırlatılır.
+                </p>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
               <button type="button" className="btn btn-secondary" onClick={() => setIsEditing(false)} disabled={updateLoading}>İptal</button>
@@ -194,13 +194,13 @@ const Profile = () => {
         ) : (
           <div className="profile-info">
             <h1 className="profile-name">
-              {profile.firstName || profile.lastName 
-                ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() 
+              {profile.firstName || profile.lastName
+                ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
                 : profile.email.split('@')[0]}
             </h1>
-            
+
             {profile.bio && <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0 0.75rem 0', fontSize: '0.95rem' }}>{profile.bio}</p>}
-            
+
             <div className="profile-email" style={{ marginBottom: '0.5rem' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
@@ -267,9 +267,9 @@ const Profile = () => {
           <div className="stat-value">
             {profile.listings.length > 0
               ? formatPrice(
-                  profile.listings.reduce((sum, l) => sum + l.price, 0) /
-                    profile.listings.length
-                )
+                profile.listings.reduce((sum, l) => sum + l.price, 0) /
+                profile.listings.length
+              )
               : '₺0'}
           </div>
           <div className="stat-label">Ortalama Fiyat</div>
@@ -391,58 +391,58 @@ const Profile = () => {
               Bu işlem geri alınamaz. Hesabınız ve tüm ilanlarınız kalıcı olarak
               silinecektir. Lütfen hesabınızı neden silmek istediğinizi belirtin:
             </p>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={deleteReasons.includes('reason1')}
                   onChange={() => toggleReason('reason1')}
                 />
                 Uygulamayı artık kullanmıyorum
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={deleteReasons.includes('reason2')}
                   onChange={() => toggleReason('reason2')}
                 />
                 Aradığım ürünleri bulamadım
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={deleteReasons.includes('reason3')}
                   onChange={() => toggleReason('reason3')}
                 />
                 İstediğim fiyata satış yapamadım
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={deleteReasons.includes('reason4')}
                   onChange={() => toggleReason('reason4')}
                 />
                 Gizlilik veya güvenlik endişelerim var
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={deleteReasons.includes('other')}
                   onChange={() => toggleReason('other')}
                 />
                 Diğer
               </label>
-              
+
               {deleteReasons.includes('other') && (
-                <textarea 
+                <textarea
                   placeholder="Lütfen nedeninizi kısaca açıklayın..."
                   value={otherReasonText}
                   onChange={(e) => setOtherReasonText(e.target.value)}
-                  style={{ 
-                    marginTop: '0.5rem', 
-                    padding: '0.75rem', 
-                    borderRadius: '0.5rem', 
+                  style={{
+                    marginTop: '0.5rem',
+                    padding: '0.75rem',
+                    borderRadius: '0.5rem',
                     border: '1px solid var(--border-color)',
                     background: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',

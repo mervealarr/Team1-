@@ -112,7 +112,7 @@ const Navbar = () => {
               <Link to="/inbox" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                 💬 Mesajlarım
               </Link>
-                {/* YENİ EKLENEN PBI: BİLDİRİM ZİLİ */}
+              {/* YENİ EKLENEN PBI: BİLDİRİM ZİLİ */}
               <NotificationBell />
               <Link to="/favorites" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'red' }}>
                 ❤️ Favorilerim

@@ -11,8 +11,8 @@ const AdminDashboard = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // PBI 5: Yeni eklenen state'ler
+
+
   const [searchTerm, setSearchTerm] = useState('');
   const [pendingReportsCount, setPendingReportsCount] = useState(0);
 
@@ -25,7 +25,7 @@ const AdminDashboard = () => {
 
     const payload = parseJwt(token);
     const role = payload?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload?.role;
-    
+
     if (role === 'Admin') {
       setIsAdmin(true);
       fetchData();
@@ -44,8 +44,8 @@ const AdminDashboard = () => {
       ]);
       setUsers(usersRes.data || []);
       setListings(listingsRes.data || []);
-      
-      // PBI 5: Bekleyen şikayet/onay sayısını hesapla (Örnek: Onay bekleyen ilanlar)
+
+
       const pendingCount = listingsRes.data?.filter(l => !l.isApproved).length || 0;
       setPendingReportsCount(pendingCount);
 
@@ -93,13 +93,13 @@ const AdminDashboard = () => {
     }
   };
 
-  // PBI 5: Arama Filtreleme Mantığı
-  const filteredUsers = users.filter(user => 
+
+  const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.id.toString().includes(searchTerm)
   );
 
-  const filteredListings = listings.filter(listing => 
+  const filteredListings = listings.filter(listing =>
     listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     listing.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     listing.id.toString().includes(searchTerm)
@@ -114,7 +114,7 @@ const AdminDashboard = () => {
         Sistem genelindeki kullanıcı, ilan ve rapor yönetim merkezi.
       </p>
 
-      {/* PBI 5: Özet İstatistik Kartları */}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
         <div className="stat-card glass" style={{ padding: '1.5rem', borderRadius: '1rem', textAlign: 'center', border: '1px solid var(--border-color)' }}>
           <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{users.length}</div>
@@ -129,11 +129,11 @@ const AdminDashboard = () => {
           <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Bekleyen İşlemler</div>
         </div>
       </div>
-      
-      {/* PBI 5: Arama Çubuğu */}
+
+
       <div style={{ marginBottom: '2rem', position: 'relative' }}>
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder={`${activeTab === 'users' ? 'Kullanıcı e-posta veya ID' : 'İlan başlığı veya kategori'} ara...`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -153,13 +153,13 @@ const AdminDashboard = () => {
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <button 
+        <button
           className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => { setActiveTab('users'); setSearchTerm(''); }}
         >
           Kullanıcı Yönetimi
         </button>
-        <button 
+        <button
           className={`btn ${activeTab === 'listings' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => { setActiveTab('listings'); setSearchTerm(''); }}
         >
@@ -176,7 +176,7 @@ const AdminDashboard = () => {
         <div className="auth-error" style={{ padding: '2rem', textAlign: 'center' }}>{error}</div>
       ) : (
         <div className="glass" style={{ padding: '1.5rem', borderRadius: '1rem', overflowX: 'auto' }}>
-          
+
           {/* KULLANICI TABLOSU */}
           {activeTab === 'users' && (
             <div>
@@ -196,9 +196,9 @@ const AdminDashboard = () => {
                       <td style={{ padding: '1rem' }}>{user.id}</td>
                       <td style={{ padding: '1rem' }}>{user.email}</td>
                       <td style={{ padding: '1rem' }}>
-                        <span style={{ 
-                          padding: '0.3rem 0.8rem', 
-                          borderRadius: '2rem', 
+                        <span style={{
+                          padding: '0.3rem 0.8rem',
+                          borderRadius: '2rem',
                           fontSize: '0.75rem',
                           fontWeight: '600',
                           backgroundColor: user.role === 'Admin' ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)',
@@ -209,7 +209,7 @@ const AdminDashboard = () => {
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'right' }}>
                         {user.role !== 'Admin' && (
-                          <button 
+                          <button
                             onClick={() => handleDeleteUser(user.id)}
                             style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1.2rem', borderRadius: '0.6rem', cursor: 'pointer', fontWeight: '500' }}
                           >
@@ -224,7 +224,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* İLAN TABLOSU */}
+
           {activeTab === 'listings' && (
             <div>
               <h3 style={{ marginBottom: '1.5rem', paddingLeft: '0.5rem' }}>Sistemdeki İlanlar ({filteredListings.length})</h3>
@@ -245,9 +245,9 @@ const AdminDashboard = () => {
                     <tr key={listing.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       <td style={{ padding: '1rem' }}>{listing.id}</td>
                       <td style={{ padding: '1rem' }}>
-                        <img 
-                          src={listing.imageUrl || 'https://via.placeholder.com/50'} 
-                          alt={listing.title} 
+                        <img
+                          src={listing.imageUrl || 'https://via.placeholder.com/50'}
+                          alt={listing.title}
                           style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid var(--border-color)' }}
                         />
                       </td>
@@ -261,9 +261,9 @@ const AdminDashboard = () => {
                         <span style={{ opacity: 0.8, fontSize: '0.85rem' }}>{listing.category}</span>
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <span style={{ 
-                          padding: '0.3rem 0.7rem', 
-                          borderRadius: '0.5rem', 
+                        <span style={{
+                          padding: '0.3rem 0.7rem',
+                          borderRadius: '0.5rem',
                           fontSize: '0.75rem',
                           fontWeight: 'bold',
                           backgroundColor: listing.isApproved ? 'rgba(34, 197, 94, 0.15)' : 'rgba(234, 179, 8, 0.15)',
@@ -273,16 +273,16 @@ const AdminDashboard = () => {
                         </span>
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                        <button 
+                        <button
                           onClick={() => handleModerateListing(listing.id, !listing.isApproved)}
-                          style={{ 
-                            background: listing.isApproved ? '#ca8a04' : '#16a34a', 
+                          style={{
+                            background: listing.isApproved ? '#ca8a04' : '#16a34a',
                             color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.5rem', cursor: 'pointer', marginRight: '0.5rem', fontSize: '0.85rem'
                           }}
                         >
                           {listing.isApproved ? 'Gizle' : 'Onayla'}
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDeleteListing(listing.id)}
                           style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}
                         >
@@ -296,7 +296,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* BOŞ SONUÇ DURUMU */}
+
           {((activeTab === 'users' && filteredUsers.length === 0) || (activeTab === 'listings' && filteredListings.length === 0)) && (
             <div style={{ textAlign: 'center', padding: '3rem', opacity: 0.5 }}>
               🔍 Arama kriterlerine uygun sonuç bulunamadı.

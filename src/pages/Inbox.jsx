@@ -28,19 +28,19 @@ function Inbox() {
         const data = await getInboxMessages();
         const messageList = Array.isArray(data) ? data : [];
 
-        // 1. ADIM: Okunmamış mesaj sayısını hesapla ve Navbar'a gönder
-        const unreadCount = messageList.filter(msg => 
+
+        const unreadCount = messageList.filter(msg =>
             Number(msg.receiverId) === Number(currentUserId) && !msg.isRead
         ).length;
 
         window.dispatchEvent(new CustomEvent('unread-count-change', { detail: unreadCount }));
 
-        // 2. ADIM: Bildirim zili kontrolü
+
         if (messageList.length > messages.length && messages.length > 0) {
             const latestMsg = messageList[messageList.length - 1];
             if (Number(latestMsg.senderId) !== Number(currentUserId)) {
-                window.dispatchEvent(new CustomEvent('new-notification', { 
-                    detail: latestMsg.content 
+                window.dispatchEvent(new CustomEvent('new-notification', {
+                    detail: latestMsg.content
                 }));
             }
         }

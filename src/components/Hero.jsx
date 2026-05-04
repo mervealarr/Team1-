@@ -14,14 +14,14 @@ const Hero = () => {
           <span className="text-gradient">Yeni Dönem</span>
         </h1>
         <p className="hero-subtitle">
-          Kullanmadığınız eşyalarınızı kolayca satın, aradığınızı anında bulun. 
+          Kullanmadığınız eşyalarınızı kolayca satın, aradığınızı anında bulun.
           Güvenli ve hızlı ticaretin adresi.
         </p>
         <div className="hero-actions">
           <button className="btn btn-primary btn-lg">Keşfetmeye Başla</button>
           <button className="btn btn-secondary btn-lg glass">Nasıl Çalışır?</button>
         </div>
-        
+
         <div className="stats-container glass">
           <div className="stat-item">
             <h3>10K+</h3>

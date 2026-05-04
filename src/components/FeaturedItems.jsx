@@ -40,7 +40,7 @@ const FeaturedItems = () => {
       alert("Favorilere eklemek için giriş yapmalısınız.");
       return;
     }
-    
+
     try {
       const { isFavorite } = await toggleFavorite(listingId);
       if (isFavorite) {

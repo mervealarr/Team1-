@@ -8,14 +8,14 @@ const ReportModal = ({ itemId, itemTitle }) => {
 
   const handleReportSubmit = (e) => {
     e.preventDefault();
-    // Gerçek API bağlandığında buraya backend post isteği gelecek
+
     alert(`Şikayetiniz alındı! (İlan ID: ${itemId} - Sebep: ${reason})`);
     setIsOpen(false);
     setReason('');
   };
 
   const handleOpen = (e) => {
-    e.stopPropagation(); // Altındaki karta tıklanmasını engeller
+    e.stopPropagation();
     setIsOpen(true);
   };
 
@@ -32,12 +32,12 @@ const ReportModal = ({ itemId, itemTitle }) => {
             <p className="modal-text">
               <strong>{itemTitle}</strong> başlıklı ilanı şikayet ediyorsunuz.
             </p>
-            
+
             <form onSubmit={handleReportSubmit}>
-              <select 
+              <select
                 className="modal-select"
-                value={reason} 
-                onChange={(e) => setReason(e.target.value)} 
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
                 required
               >
                 <option value="" disabled>Lütfen bir sebep seçin</option>
@@ -46,7 +46,7 @@ const ReportModal = ({ itemId, itemTitle }) => {
                 <option value="spam">Spam / Tekrarlayan İlan</option>
                 <option value="other">Diğer</option>
               </select>
-              
+
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setIsOpen(false)}>
                   İptal
