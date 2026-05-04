@@ -1,0 +1,59 @@
+.notification-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bell-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.bell-btn:hover {
+  transform: scale(1.1);
+}
+
+.badge {
+  position: absolute;
+  top: 0; 
+  right: 0;
+  background-color: #ef4444; 
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 0.6rem;
+  font-weight: bold;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 45px; 
+  right: -50px;
+  width: 280px;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-primary, white);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.notif-item {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary, #f9fafb);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.notif-item.unread {
+  border-left: 3px solid #3b82f6;
+  background: var(--bg-tertiary, #eff6ff);
+}

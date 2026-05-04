@@ -1,0 +1,122 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SwapSell.API.Data;
+using SwapSell.API.Models;
+
+namespace SwapSell.API.Services
+{
+    public class DatabaseSeeder : IHostedService
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public DatabaseSeeder(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            await context.Database.EnsureCreatedAsync(cancellationToken);
+
+            // Removed raw SQL execution to support SQLite fallback
+
+            if (!await context.Users.AnyAsync(cancellationToken))
+            {
+                var adminUser = new User
+                {
+                    Email = "demo@swapsell.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), // Hash for "password"
+                    Role = "Admin"
+                };
+                
+                var normalUser = new User
+                {
+                    Email = "user@swapsell.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), // Hash for "password"
+                    Role = "User"
+                };
+
+                context.Users.Add(adminUser);
+                context.Users.Add(normalUser);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            if (!await context.Listings.AnyAsync(cancellationToken))
+            {
+                var admin = await context.Users.FirstOrDefaultAsync(u => u.Email == "demo@swapsell.com", cancellationToken);
+                var normalUser = await context.Users.FirstOrDefaultAsync(u => u.Email == "user@swapsell.com", cancellationToken);
+                
+                var dummyListings = new[]
+                {
+                    new Listing
+                    {
+                        Title = "MacBook Pro M2 16\"",
+                        Description = "Tertemiz, çiziksiz M2 işlemcili MacBook Pro. 16GB RAM, 512GB SSD.",
+                        Category = "Elektronik",
+                        Price = 45000m,
+                        ImageUrl = "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+                        UserId = admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddDays(-2),
+                        IsApproved = true
+                    },
+                    new Listing
+                    {
+                        Title = "Sony Alpha a7 III Kasa",
+                        Description = "Profesyonel aynasız fotoğraf makinesi. Sadece kasa, lens dahil değildir. Shutter 12K.",
+                        Category = "Elektronik",
+                        Price = 32500m,
+                        ImageUrl = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
+                        UserId = normalUser?.Id ?? admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddDays(-1),
+                        IsApproved = true
+                    },
+                    new Listing
+                    {
+                        Title = "Herman Miller Aeron Koltuk",
+                        Description = "B size, bel destekli efsane ofis koltuğu. Garantisi devam ediyor.",
+                        Category = "Mobilya",
+                        Price = 18000m,
+                        ImageUrl = "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&w=800&q=80",
+                        UserId = normalUser?.Id ?? admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddHours(-12),
+                        IsApproved = true
+                    },
+                    new Listing
+                    {
+                        Title = "PlayStation 5 Çift Kol",
+                        Description = "Kutusunda duruyor, zamanım olmadığı için satıyorum. 2 adet dualsense dahil.",
+                        Category = "Elektronik",
+                        Price = 15500m,
+                        ImageUrl = "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80",
+                        UserId = admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddHours(-5),
+                        IsApproved = true
+                    },
+                    new Listing
+                    {
+                        Title = "Dyson V15 Süpürge",
+                        Description = "Kutusunda sıfır ayarında, ihtiyaç fazlası olduğu için satıyorum. Garanti belgesi mevcut.",
+                        Category = "Elektronik",
+                        Price = 25000m,
+                        ImageUrl = "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=800&q=80",
+                        UserId = normalUser?.Id ?? admin.Id,
+                        CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+                        IsApproved = false // ONAY BEKLEYEN ÖRNEK İLAN
+                    }
+                };
+
+                context.Listings.AddRange(dummyListings);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+}
