@@ -117,4 +117,36 @@ export const getFavoriteIds = async () => {
   return response.data;
 };
 
+// Reports Endpoints
+export const submitReport = async (listingId, reason) => {
+  const response = await api.post('/reports', { listingId, reason });
+  return response.data;
+};
+
+export const getReports = async () => {
+  const response = await api.get('/reports');
+  return response.data;
+};
+
+export const resolveReport = async (id) => {
+  const response = await api.put(`/reports/${id}/resolve`);
+  return response.data;
+};
+
+// Notifications Endpoints
+export const getMyNotifications = async () => {
+  const response = await api.get('/notifications');
+  return response.data;
+};
+
+export const markNotificationAsRead = async (id) => {
+  const response = await api.put(`/notifications/${id}/read`);
+  return response.data;
+};
+
+export const markAllNotificationsAsRead = async () => {
+  const response = await api.put('/notifications/read-all');
+  return response.data;
+};
+
 export default api;

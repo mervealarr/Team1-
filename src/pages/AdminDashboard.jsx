@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../utils';
-import { getAllUsers, adminDeleteUser, adminDeleteListing, getAdminListings, moderateListing } from '../api';
+import { getAllUsers, adminDeleteUser, adminDeleteListing, getAdminListings, moderateListing, getReports, resolveReport } from '../api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -9,6 +9,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [listings, setListings] = useState([]);
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -38,15 +39,17 @@ const AdminDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const [usersRes, listingsRes] = await Promise.all([
+      const [usersRes, listingsRes, reportsRes] = await Promise.all([
         getAllUsers(),
-        getAdminListings()
+        getAdminListings(),
+        getReports()
       ]);
       setUsers(usersRes.data || []);
       setListings(listingsRes.data || []);
+      setReports(reportsRes || []);
 
 
-      const pendingCount = listingsRes.data?.filter(l => !l.isApproved).length || 0;
+      const pendingCount = (listingsRes.data?.filter(l => !l.isApproved).length || 0) + (reportsRes?.filter(r => !r.isResolved).length || 0);
       setPendingReportsCount(pendingCount);
 
     } catch (err) {
@@ -164,6 +167,12 @@ const AdminDashboard = () => {
           onClick={() => { setActiveTab('listings'); setSearchTerm(''); }}
         >
           İlan Yönetimi
+        </button>
+        <button
+          className={`btn ${activeTab === 'reports' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => { setActiveTab('reports'); setSearchTerm(''); }}
+        >
+          Şikayetler
         </button>
       </div>
 
@@ -297,7 +306,70 @@ const AdminDashboard = () => {
           )}
 
 
-          {((activeTab === 'users' && filteredUsers.length === 0) || (activeTab === 'listings' && filteredListings.length === 0)) && (
+          {activeTab === 'reports' && (
+            <div>
+              <h3 style={{ marginBottom: '1.5rem', paddingLeft: '0.5rem' }}>Gelen Şikayetler ({reports.length})</h3>
+              <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)', opacity: 0.7 }}>
+                    <th style={{ padding: '1rem' }}>ID</th>
+                    <th style={{ padding: '1rem' }}>Şikayet Eden</th>
+                    <th style={{ padding: '1rem' }}>İlan</th>
+                    <th style={{ padding: '1rem' }}>Sebep</th>
+                    <th style={{ padding: '1rem', textAlign: 'center' }}>Durum</th>
+                    <th style={{ padding: '1rem', textAlign: 'right' }}>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reports.map(report => (
+                    <tr key={report.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: '0.3s' }} className="table-row-hover">
+                      <td style={{ padding: '1rem' }}>{report.id}</td>
+                      <td style={{ padding: '1rem' }}>{report.reporterEmail}</td>
+                      <td style={{ padding: '1rem', fontWeight: 'bold' }}>
+                        <a href={`/listings/${report.listingId}`} style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>
+                          {report.listingTitle}
+                        </a>
+                      </td>
+                      <td style={{ padding: '1rem', color: '#ef4444' }}>{report.reason}</td>
+                      <td style={{ padding: '1rem', textAlign: 'center' }}>
+                        <span style={{
+                          padding: '0.3rem 0.8rem',
+                          borderRadius: '2rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          backgroundColor: report.isResolved ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                          color: report.isResolved ? '#22c55e' : '#ef4444'
+                        }}>
+                          {report.isResolved ? 'Çözüldü' : 'İnceleniyor'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'right' }}>
+                        {!report.isResolved && (
+                          <button
+                            onClick={async () => {
+                              try {
+                                await resolveReport(report.id);
+                                setReports(reports.map(r => r.id === report.id ? { ...r, isResolved: true } : r));
+                                setPendingReportsCount(prev => prev - 1);
+                              } catch (err) {
+                                alert('Şikayet güncellenemedi.');
+                              }
+                            }}
+                            style={{ background: '#22c55e', color: 'white', border: 'none', padding: '0.5rem 1.2rem', borderRadius: '0.6rem', cursor: 'pointer', fontWeight: '500' }}
+                          >
+                            Çözüldü
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+
+          {((activeTab === 'users' && filteredUsers.length === 0) || (activeTab === 'listings' && filteredListings.length === 0) || (activeTab === 'reports' && reports.length === 0)) && (
             <div style={{ textAlign: 'center', padding: '3rem', opacity: 0.5 }}>
               🔍 Arama kriterlerine uygun sonuç bulunamadı.
             </div>

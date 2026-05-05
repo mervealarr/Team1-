@@ -169,14 +169,27 @@ const CreateListing = () => {
             {/* Canlı Önizleme Alanı */}
             {videoUrl && (
               <div style={{ marginTop: '1rem', borderRadius: 'var(--radius-md)', overflow: 'hidden' }} className="glass">
-                <video 
-                  src={videoUrl} 
-                  controls 
-                  style={{ width: '100%', display: 'block' }}
-                  onError={(e) => console.log("Video yüklenemedi, bağlantıyı kontrol edin.")}
-                >
-                  Tarayıcınız video oynatmayı desteklemiyor.
-                </video>
+                {videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i) ? (
+                  <iframe
+                    width="100%"
+                    height="315"
+                    src={`https://www.youtube.com/embed/${videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i)[1]}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ borderRadius: 'var(--radius-md)', display: 'block', border: 'none' }}
+                  ></iframe>
+                ) : (
+                  <video 
+                    src={videoUrl} 
+                    controls 
+                    style={{ width: '100%', display: 'block' }}
+                    onError={(e) => console.log("Video yüklenemedi, bağlantıyı kontrol edin.")}
+                  >
+                    Tarayıcınız video oynatmayı desteklemiyor.
+                  </video>
+                )}
               </div>
             )}
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>

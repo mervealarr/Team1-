@@ -139,13 +139,26 @@ const ProductDetails = () => {
             <div className="product-video-container" style={{ marginTop: '2rem' }}>
               <h3 className="section-title">Ürün Tanıtım Videosu</h3>
               <div className="glass" style={{ padding: '1rem', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-                <video 
-                  src={product.videoUrl} 
-                  controls 
-                  style={{ width: '100%', borderRadius: 'var(--radius-md)', display: 'block' }}
-                >
-                  Tarayıcınız video oynatmayı desteklemiyor.
-                </video>
+                {product.videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i) ? (
+                  <iframe
+                    width="100%"
+                    height="400"
+                    src={`https://www.youtube.com/embed/${product.videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i)[1]}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ borderRadius: 'var(--radius-md)', display: 'block' }}
+                  ></iframe>
+                ) : (
+                  <video 
+                    src={product.videoUrl} 
+                    controls 
+                    style={{ width: '100%', borderRadius: 'var(--radius-md)', display: 'block' }}
+                  >
+                    Tarayıcınız video oynatmayı desteklemiyor.
+                  </video>
+                )}
               </div>
             </div>
           )}
@@ -174,7 +187,7 @@ const ProductDetails = () => {
                 </button>
 
                 {/* YENİ EKLENEN PBI: ŞİKAYET BUTONU */}
-                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: '100%' }}>
                   <ReportModal itemId={product.id} itemTitle={product.title} />
                 </div>
               </>

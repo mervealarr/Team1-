@@ -10,6 +10,8 @@ namespace SwapSell.API.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Listing> Listings { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +37,24 @@ namespace SwapSell.API.Data
                 .HasOne(f => f.Listing)
                 .WithMany()
                 .HasForeignKey(f => f.ListingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Reporter)
+                .WithMany()
+                .HasForeignKey(r => r.ReporterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Listing)
+                .WithMany()
+                .HasForeignKey(r => r.ListingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

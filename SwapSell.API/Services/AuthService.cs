@@ -69,10 +69,10 @@ namespace SwapSell.API.Services
                 return null;
             }
 
-            if (!user.IsEmailConfirmed)
-            {
-                throw new UnauthorizedAccessException("Lütfen önce e-postanızı onaylayın.");
-            }
+            // if (!user.IsEmailConfirmed)
+            // {
+            //     throw new UnauthorizedAccessException("Lütfen önce e-postanızı onaylayın.");
+            // }
 
             var token = GenerateJwtToken(user);
             return new AuthResponseDto { Token = token };

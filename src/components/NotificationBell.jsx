@@ -1,40 +1,81 @@
-import React, { useState, useEffect } from 'react'; // useEffect eklendi
+import React, { useState, useEffect } from 'react';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { getMyNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../api';
+import { useNavigate } from 'react-router-dom';
 import './NotificationBell.css';
 
 const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: '📉 Favorilerinizdeki "Mimari Çizim Masası" fiyatı düştü!', isRead: false },
-    { id: 2, message: '💬 Yeni bir mesajınız var.', isRead: false }
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [connection, setConnection] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleNewNotif = (e) => {
+    fetchNotifications();
 
-      const newNotif = {
-        id: Date.now(),
-        message: `✉️ Yeni Mesaj: ${e.detail}`,
-        isRead: false
-      };
-      setNotifications(prev => [newNotif, ...prev]);
-    };
+    const token = localStorage.getItem('token');
+    if (token) {
+      const newConnection = new HubConnectionBuilder()
+        .withUrl(`http://localhost:5237/hubs/notification?access_token=${token}`)
+        .configureLogging(LogLevel.Information)
+        .withAutomaticReconnect()
+        .build();
 
-
-    window.addEventListener('new-notification', handleNewNotif);
-
-
-    return () => window.removeEventListener('new-notification', handleNewNotif);
+      setConnection(newConnection);
+    }
   }, []);
+
+  useEffect(() => {
+    if (connection) {
+      connection.start()
+        .then(() => {
+          console.log('Connected to NotificationHub!');
+          connection.on('ReceiveNotification', (message) => {
+            const newNotif = {
+              id: Date.now(),
+              message: message,
+              isRead: false,
+              createdAt: new Date().toISOString()
+            };
+            setNotifications(prev => [newNotif, ...prev]);
+          });
+        })
+        .catch(e => console.log('Connection failed: ', e));
+    }
+  }, [connection]);
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await getMyNotifications();
+      setNotifications(data || []);
+    } catch (err) {
+      console.log('Failed to fetch notifications');
+    }
+  };
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const handleToggle = (e) => {
+  const handleToggle = async (e) => {
     e.stopPropagation();
     setIsOpen(!isOpen);
-    if (!isOpen) {
-      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+    if (!isOpen && unreadCount > 0) {
+      try {
+        await markAllNotificationsAsRead();
+        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+      } catch (err) { }
+    }
+  };
+
+  const handleNotificationClick = async (notif) => {
+    if (!notif.isRead) {
+      try {
+        await markNotificationAsRead(notif.id);
+        setNotifications(notifications.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+      } catch (err) {}
+    }
+    setIsOpen(false);
+    if (notif.listingId) {
+      navigate(`/listings/${notif.listingId}`);
     }
   };
 
@@ -54,7 +95,12 @@ const NotificationBell = () => {
             <p className="notif-empty">Yeni bildirim yok.</p>
           ) : (
             notifications.map(notif => (
-              <div key={notif.id} className={`notif-item ${!notif.isRead ? 'unread' : ''}`}>
+              <div 
+                key={notif.id} 
+                className={`notif-item ${!notif.isRead ? 'unread' : ''}`}
+                onClick={() => handleNotificationClick(notif)}
+                style={{ cursor: notif.listingId ? 'pointer' : 'default' }}
+              >
                 <p style={{ margin: 0 }}>{notif.message}</p>
               </div>
             ))

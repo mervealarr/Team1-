@@ -1,17 +1,27 @@
-
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import './ReportModal.css';
+import { submitReport } from '../api';
 
 const ReportModal = ({ itemId, itemTitle }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleReportSubmit = (e) => {
+  const handleReportSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    alert(`Şikayetiniz alındı! (İlan ID: ${itemId} - Sebep: ${reason})`);
-    setIsOpen(false);
-    setReason('');
+    try {
+      await submitReport(itemId, reason);
+      alert(`Şikayetiniz başarıyla iletildi!`);
+      setIsOpen(false);
+      setReason('');
+    } catch (error) {
+      alert('Şikayet gönderilirken bir hata oluştu. Giriş yaptığınızdan emin olun.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleOpen = (e) => {
@@ -20,12 +30,16 @@ const ReportModal = ({ itemId, itemTitle }) => {
   };
 
   return (
-    <div className="report-wrapper">
-      <button className="btn report-btn" onClick={handleOpen}>
-        Şikayet Et
+    <div className="report-wrapper" style={{ width: '100%', marginTop: '0.5rem' }}>
+      <button 
+        className="btn btn-secondary btn-lg action-btn" 
+        onClick={handleOpen}
+        style={{ width: '100%', borderColor: '#ef4444', color: '#ef4444' }}
+      >
+        🚨 İlanı Şikayet Et
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}>
           <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginTop: 0, color: 'var(--text-primary)' }}>İlanı Şikayet Et</h3>
@@ -57,7 +71,8 @@ const ReportModal = ({ itemId, itemTitle }) => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
