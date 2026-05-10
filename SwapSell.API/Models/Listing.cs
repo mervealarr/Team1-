@@ -22,6 +22,14 @@ namespace SwapSell.API.Models
         public string Category { get; set; } = string.Empty;
 
         [Required]
+        [MaxLength(100)]
+        public string Location { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(50)]
+        public string Condition { get; set; } = "İkinci El";
+
+        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
@@ -29,7 +37,7 @@ namespace SwapSell.API.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public bool IsApproved { get; set; } = false;
+        public bool IsApproved { get; set; } = true;
 
         [Required]
         public int UserId { get; set; }

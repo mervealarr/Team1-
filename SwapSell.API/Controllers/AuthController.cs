@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,17 +13,23 @@ namespace SwapSell.API.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public AuthController(IAuthService authService, IConfiguration configuration)
+        public AuthController(
+            IAuthService authService,
+            IConfiguration configuration,
+            IEmailService emailService)
         {
             _authService = authService;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             var user = await _authService.RegisterAsync(registerDto);
+
             if (user == null)
             {
                 return BadRequest(new { message = "User already exists with this email." });
@@ -37,6 +44,7 @@ namespace SwapSell.API.Controllers
             try
             {
                 var response = await _authService.LoginAsync(loginDto);
+
                 if (response == null)
                 {
                     return Unauthorized(new { message = "Invalid email or password." });
@@ -54,17 +62,35 @@ namespace SwapSell.API.Controllers
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
         {
             var token = await _authService.ForgotPasswordAsync(forgotPasswordDto.Email);
-            if (token == null)
+
+            if (token != null)
             {
-                // In a real app, don't reveal that the user does not exist
-                return Ok(new { message = "If your email is registered, you will receive a password reset link." });
+                var frontendUrl = _configuration["AppUrls:FrontendBaseUrl"] ?? "http://localhost:5173";
+
+                var encodedEmail = WebUtility.UrlEncode(forgotPasswordDto.Email);
+                var encodedToken = WebUtility.UrlEncode(token);
+
+                var resetLink = $"{frontendUrl}/reset-password?email={encodedEmail}&token={encodedToken}";
+
+                var subject = "SwapSell Password Reset";
+
+                var body = $@"
+                    <h2>Password Reset Request</h2>
+                    <p>Hello,</p>
+                    <p>You requested to reset your SwapSell password.</p>
+                    <p>Please click the link below to reset your password:</p>
+                    <p>
+                        <a href='{resetLink}'>Reset My Password</a>
+                    </p>
+                    <p>If you did not request this, you can ignore this email.</p>
+                ";
+
+                await _emailService.SendEmailAsync(forgotPasswordDto.Email, subject, body);
             }
 
-            // Return the token for local development testing
-            return Ok(new 
-            { 
-                message = "If your email is registered, you will receive a password reset link.",
-                resetToken = token // WARNING: Only for local testing! Remove in production.
+            return Ok(new
+            {
+                message = "If your email is registered, you will receive a password reset link."
             });
         }
 
@@ -72,6 +98,7 @@ namespace SwapSell.API.Controllers
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
             var success = await _authService.ResetPasswordAsync(resetPasswordDto);
+
             if (!success)
             {
                 return BadRequest(new { message = "Invalid token or token has expired." });
@@ -91,6 +118,7 @@ namespace SwapSell.API.Controllers
             }
 
             var success = await _authService.ActivateEmailAsync(email, token);
+
             if (!success)
             {
                 return Redirect($"{frontendUrl}/login?error=activation_failed");

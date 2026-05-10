@@ -21,6 +21,14 @@ namespace SwapSell.API.DTOs
         public decimal Price { get; set; }
 
         public string ImageUrl { get; set; } = string.Empty;
+
+        [Required]
+[MaxLength(100)]
+public string Location { get; set; } = string.Empty;
+
+[Required]
+[MaxLength(50)]
+public string Condition { get; set; } = "İkinci El";
     }
 
     public class UpdateListingDto
@@ -42,6 +50,14 @@ namespace SwapSell.API.DTOs
         public decimal Price { get; set; }
 
         public string ImageUrl { get; set; } = string.Empty;
+
+        [Required]
+[MaxLength(100)]
+public string Location { get; set; } = string.Empty;
+
+[Required]
+[MaxLength(50)]
+public string Condition { get; set; } = "İkinci El";
     }
 
     public class ListingResponseDto
@@ -56,5 +72,8 @@ namespace SwapSell.API.DTOs
         public bool IsApproved { get; set; }
         public int SellerId { get; set; }
         public string SellerEmail { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+public string Condition { get; set; } = "İkinci El";
+    
     }
 }
