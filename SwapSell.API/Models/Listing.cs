@@ -31,6 +31,8 @@ namespace SwapSell.API.Models
 
         public bool IsApproved { get; set; } = false;
 
+        public bool IsSold { get; set; } = false;
+
         [Required]
         public int UserId { get; set; }
 

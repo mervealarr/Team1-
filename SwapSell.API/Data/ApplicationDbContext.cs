@@ -9,6 +9,8 @@ namespace SwapSell.API.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Listing> Listings { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
