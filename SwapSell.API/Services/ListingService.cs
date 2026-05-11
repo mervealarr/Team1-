@@ -40,6 +40,7 @@ namespace SwapSell.API.Services
                 ImageUrl = created.ImageUrl,
                 CreatedAt = created.CreatedAt,
                 IsApproved = created.IsApproved,
+                IsSold = created.IsSold,
                 SellerId = created.UserId,
                 SellerEmail = created.User?.Email ?? string.Empty
             };
@@ -58,6 +59,7 @@ namespace SwapSell.API.Services
                 ImageUrl = l.ImageUrl,
                 CreatedAt = l.CreatedAt,
                 IsApproved = l.IsApproved,
+                IsSold = l.IsSold,
                 SellerId = l.UserId,
                 SellerEmail = l.User?.Email ?? string.Empty
             });
@@ -78,6 +80,7 @@ namespace SwapSell.API.Services
                 ImageUrl = listing.ImageUrl,
                 CreatedAt = listing.CreatedAt,
                 IsApproved = listing.IsApproved,
+                IsSold = listing.IsSold,
                 SellerId = listing.UserId,
                 SellerEmail = listing.User?.Email ?? string.Empty
             };
@@ -120,6 +123,7 @@ namespace SwapSell.API.Services
                 ImageUrl = listing.ImageUrl,
                 CreatedAt = listing.CreatedAt,
                 IsApproved = listing.IsApproved,
+                IsSold = listing.IsSold,
                 SellerId = listing.UserId,
                 SellerEmail = listing.User?.Email ?? string.Empty
             };
